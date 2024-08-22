@@ -1,7 +1,4 @@
-# FYS5429 Project 2
-## Advanced machine learning and data analysis for the physical sciences
+# FYS4150 
+## Computational Physics
 
-This repository contains the second project for the course for the spring semester of 2024. 
-
-### Course content
-- 
+This repository contains the projects for the fall semester of 2024. 
