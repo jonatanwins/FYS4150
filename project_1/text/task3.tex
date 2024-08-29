@@ -1,0 +1,19 @@
+The discretized version of the Poisson equation expressed using the double derivative approximation:
+\begin{align}
+    \frac{d^2u}{dx^2}  &= \frac{u_{i+1} - 2u_{i} + u_{i-1}}{(\Delta x)^2} + O(\Delta x^2)  \\
+    \frac{d^2u}{dx^2} &\sim \frac{v_{i+1} - 2v_{i} + v_{i-1}}{(\Delta x)^2}
+    \label{derivative_approx}
+\end{align}
+
+Define $v_i$ as the discretized approximation to $u_i$. The result in Eq. \ref{derivative_approx} is derived from adding the Taylor Expansion for $x_{i+1} $ and $x_{i-1}$ around point $x_i$ for $\Delta x^2 = h$: 
+\begin{align*}
+    u_{i+1} = u_i + u'h + \frac{1}{2}u''^2 + \frac{1}{6}u'''h^3 + O(h^4)\\
+    u_{i-1} = u_i - u'h + \frac{1}{2}u''h^2 - \frac{1}{6}u'''h^3 + O(h^4) 
+\end{align*}
+
+The elimination of odd powers explane the order of error $O(\Delta x^2)$. Combining Eq. \ref{poisson_eq} and \ref{derivative_approx} gives:
+\begin{align}
+    v_{i+1} - 2v_{i} + v_{i-1} = (\Delta x)^2 f(x)
+\end{align}
+
+
