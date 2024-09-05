@@ -5,14 +5,12 @@
 std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& f, double v_0, double v_n_plus_1 ) {
 
     int n = b.size();
-    double h = 1.0/n;
+    double h = 10./n;
 
     std::vector<double> g(n+2);
 
-    g[0] = 1.; // not for use, only to keep the indices correct
     g[1] = h*h*f[1] + v_0;
     g[n] = h*h*f[n] + v_n_plus_1;
-    g[n+1] = 1.; // not for use, only to keep the indices correct
 
     std::vector<double> btilde(n+2);
     std::vector<double> gtilde(n+2);
@@ -79,7 +77,7 @@ int main() {
 
     std::vector<double> f(n+2);
     for (int i = 1; i <= n; i++) {
-        f[i] = 100*exp(-10*i/n);
+        f[i] = 100*exp(-10*(i/n));
     }
 
     f[0] = v_0;
@@ -96,3 +94,4 @@ int main() {
     return 0;
 
 }
+
