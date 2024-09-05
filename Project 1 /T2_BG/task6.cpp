@@ -59,17 +59,17 @@ std::vector<double> solveTridiagonalMatrixEquation(const std::vector<double>& a,
 
 // Exact solution : u(x) = 1 - (1-e^{-10})x - e^{-10x}
 
-std::vector<double> exactSolution(int n) {
+std::vector<double> exactSolution(double n) {
     
     std::vector<double> u(n+2);
-    for (int i = 0; i < n+2; i++) {
+    for (int i = 0; i <= n+1; i++) {
         u[i] = 1 - (1 - exp(-10))*(i/n) - exp(-10*(i/n));
     }
     return u;
 }
 
 int main() {
-    int n = 10;           
+    int n = 100;           
     double v_0 = 0.0;      
     double v_n_plus_1 = 0.0;  
 
@@ -90,11 +90,9 @@ int main() {
 
     // print v versus u 
 
-    for (int i = 0; i < n+2; i++) {
+    for (int i = 0; i <= n+2; i++) {
         std::cout << v[i] << " " << u[i] << std::endl;
     }
- 
     return 0;
 
 }
-
