@@ -591,3 +591,4 @@ $RECYCLE.BIN/
 # For C++ projects
 .vscode
 out
+run.sh

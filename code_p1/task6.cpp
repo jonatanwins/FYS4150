@@ -71,7 +71,7 @@ std::vector<double> exactSolution(double n) {
 }
 
 int main() {
-    int n = 100;           
+    double n = 100;           
     double v_0 = 0.0;      
     double v_n_plus_1 = 0.0;  
 
@@ -82,6 +82,7 @@ int main() {
     std::vector<double> f(n+2);
     for (int i = 1; i <= n; i++) {
         f[i] = 100*exp(-10*(i/n));
+        std::cout << f[i] << std::endl;
     }
 
     f[0] = v_0;
@@ -93,7 +94,7 @@ int main() {
     // print v versus u 
 
     for (int i = 0; i <= n+2; i++) {
-        std::cout << v[i] << " " << u[i] << std::endl;
+        std::cout << v[i] << " " << u[i] << std::endl ;
     }
     return 0;
 
