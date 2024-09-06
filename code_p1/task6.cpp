@@ -4,7 +4,7 @@
 
 std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& f, double v_0, double v_n_plus_1 ) {
 
-    int n = b.size();
+    int n = b.size()-1;
     double h = 1./n;
 
     std::vector<double> g(n+2);
@@ -34,7 +34,7 @@ std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const st
 
 std::vector<double> backwardSubstitution(const std::vector<double>& gtilde, const std::vector<double>& btilde, const std::vector<double>& c, double v_0, double v_n_plus_1) {
 
-    int n = c.size()+1;
+    int n = c.size();
     std::vector<double> v(n+2);
 
     v[0] = v_0;
@@ -71,22 +71,19 @@ std::vector<double> exactSolution(double n) {
 }
 
 int main() {
-    double n = 100;           
+    double n = 1000;           
     double v_0 = 0.0;      
     double v_n_plus_1 = 0.0;  
 
-    std::vector<double> a(n-1, -1.0);
-    std::vector<double> b(n, 2.0);
-    std::vector<double> c(n-1, -1.0);
+    std::vector<double> a(n, -1.0);
+    std::vector<double> b(n+1, 2.0);
+    std::vector<double> c(n, -1.0);
 
     std::vector<double> f(n+2);
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i <= n+1; i++) {
         f[i] = 100*exp(-10*(i/n));
         std::cout << f[i] << std::endl;
     }
-
-    f[0] = v_0;
-    f[n+1] = v_n_plus_1;
 
     std::vector<double> v = solveTridiagonalMatrixEquation(a, b, c, f, v_0, v_n_plus_1);
     std::vector<double> u = exactSolution(n);
