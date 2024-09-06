@@ -1,128 +1,53 @@
 #include "utils.hpp" // Assuming this file contains necessary declarations
 
-// Forward substitution function
-
-std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& f, double v_0, double v_n_plus_1 ) {
-
-    int n = b.size()-1;
-    double h = 1./n;
-
-    std::vector<double> g(n+2);
-
-    g[1] = h*h*f[1] + v_0;
-    g[n] = h*h*f[n] + v_n_plus_1;
-
-    for (int i = 2; i <= n-1; i++) {
-        g[i] = h*h*f[i];
-    }
-
-    std::vector<double> btilde(n+2);
-    std::vector<double> gtilde(n+2);
-
-    btilde[1] = b[1];
-    gtilde[1] = g[1];
- 
-    for (int i = 2; i <= n; i++) {
-        double w = (a[i]/btilde[i-1]);
-        btilde[i] = b[i] - w*c[i-1];
-        gtilde[i] = g[i] - w*gtilde[i-1];
-    }
-
-    return {gtilde, btilde};   
-}
-
-// Backward substitution function
-
-std::vector<double> backwardSubstitution(const std::vector<double>& gtilde, const std::vector<double>& btilde, const std::vector<double>& c, double v_0, double v_n_plus_1) {
-
-    int n = c.size();
-    std::vector<double> v(n+2);
-
-    v[0] = v_0;
-    v[n+1] = v_n_plus_1;
-
-    v[n] = gtilde[n]/btilde[n];
-
-    for (int i = n-1; i >= 1; i--) {
-        v[i] = (gtilde[i] - v[i+1]*c[i])/btilde[i];
-    }
-
-    return v;
-}
-
-// Function to solve the tridiagonal matrix equation
-
-std::vector<double> solveTridiagonalMatrixEquation(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& f, double v_0, double v_n_plus_1) {
-
-    std::pair<std::vector<double>, std::vector<double>> forw = forwardSubstitution(a, b, c, f, v_0, v_n_plus_1);
-    std::vector<double> gtilde = forw.first;
-    std::vector<double> btilde = forw.second;
-    return backwardSubstitution(gtilde, btilde, c, v_0, v_n_plus_1);
-}
-
-// Exact solution : u(x) = 1 - (1-e^{-10})x - e^{-10x}
-
-std::vector<double> exactSolution(double n) {
-    
-    std::vector<double> u(n+2);
-    for (int i = 0; i <= n+1; i++) {
-        u[i] = 1 - (1 - exp(-10))*(i/n) - exp(-10*(i/n));
-    }
-    return u;
-}
-
-
-int w_file(const std::string& filename, const std::vector<double>& x, const std::vector<double>& u)
-{
-  // Create an "output file stream" (type std::ofstream)
-  // and connect it to our filename.
-  std::ofstream ofile;
-  ofile.open(filename);
-
-  // Send vectors to output file
-  int prec = 8;
-  for (size_t i = 0; i < x.size(); i++)
-  {
-    ofile << std::setprecision(prec) << std::scientific << x[i] << ' ' << u[i] << std::endl;
-  }
-  
-  
-  
-  // Close the output file
-  ofile.close();
-
-  // All is well. Exit program with return code 0.
-  return 0;
-}
-
 int main() {
-    double n = 100;           
-    double v_0 = 0.0;      
-    double v_n_plus_1 = 0.0;  
 
-    std::vector<double> a(n, -1.0);
-    std::vector<double> b(n+1, 2.0);
-    std::vector<double> c(n, -1.0);
+    int values[] = {10+1, 100+1, 1000+1, 10000+1, 100000+1, 1000000+1, 10000000+1};
+    int num_n = sizeof(values) / sizeof(values[0]);
+    std::vector<double> runtimes(num_n, 1.0); 
+    
+    for (int i = 0; i < num_n; ++i) {
+        double n = values[i];
 
-    std::vector<double> f(n+2);
-    for (int i = 0; i <= n+1; i++) {
-        f[i] = 100*exp(-10*(i/n));
-        std::cout << f[i] << std::endl;
+        double v_0 = 0.0;      
+        double v_n_plus_1 = 0.0;
+
+        std::vector<double> a(n, -1.0);
+        std::vector<double> b(n+1, 2.0);
+        std::vector<double> c(n, -1.0);
+
+        std::vector<double> f(n+2);
+        for (int i = 0; i <= n+1; i++) {
+            f[i] = 100*exp(-10*(i/n));
+        }
+
+        auto start = std::chrono::high_resolution_clock::now();
+
+        std::vector<double> v = solveTridiagonalMatrixEquation(a, b, c, f, v_0, v_n_plus_1);
+        std::vector<double> u = exactSolution(n);
+
+        auto end = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double> runtime = end - start;
+        runtimes[i] = runtime.count();
+                
+        int int_n = static_cast<int>(n - 1);
+
+        std::string filename = "data/v_and_u_n_" + std::to_string(int_n) + ".txt";
+        w_file(filename, v, u);
+
     }
 
-    std::vector<double> v = solveTridiagonalMatrixEquation(a, b, c, f, v_0, v_n_plus_1);
-    std::vector<double> u = exactSolution(n);
-
-    // print v versus u 
-
-    for (int i = 0; i <= n+2; i++) {
-        std::cout << v[i] << " " << u[i] << std::endl ;
+    std::vector<int> values_vector;
+    for (int i = 0; i < num_n; ++i) {
+        values_vector.push_back(values[i] - 1);
     }
-
-    std::string filename = "data/vun100.txt";
-    w_file(filename, v, u);
+    std::string filename_runtime = "data/runtime";
+    w_file_one(filename_runtime, values_vector, runtimes);
 
     return 0;
 
 }
+
+
 
