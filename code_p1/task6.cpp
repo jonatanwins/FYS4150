@@ -23,8 +23,9 @@ std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const st
     gtilde[1] = g[1];
  
     for (int i = 2; i <= n; i++) {
-        btilde[i] = b[i] - (a[i]/btilde[i-1])*c[i-1];
-        gtilde[i] = g[i] - (a[i]/btilde[i-1])*gtilde[i-1];
+        double w = (a[i]/btilde[i-1]);
+        btilde[i] = b[i] - w*c[i-1];
+        gtilde[i] = g[i] - w*gtilde[i-1];
     }
 
     return {gtilde, btilde};   
