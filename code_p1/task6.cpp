@@ -71,8 +71,32 @@ std::vector<double> exactSolution(double n) {
     return u;
 }
 
+
+int w_file(const std::string& filename, const std::vector<double>& x, const std::vector<double>& u)
+{
+  // Create an "output file stream" (type std::ofstream)
+  // and connect it to our filename.
+  std::ofstream ofile;
+  ofile.open(filename);
+
+  // Send vectors to output file
+  int prec = 8;
+  for (size_t i = 0; i < x.size(); i++)
+  {
+    ofile << std::setprecision(prec) << std::scientific << x[i] << ' ' << u[i] << std::endl;
+  }
+  
+  
+  
+  // Close the output file
+  ofile.close();
+
+  // All is well. Exit program with return code 0.
+  return 0;
+}
+
 int main() {
-    double n = 1000;           
+    double n = 100;           
     double v_0 = 0.0;      
     double v_n_plus_1 = 0.0;  
 
@@ -94,6 +118,10 @@ int main() {
     for (int i = 0; i <= n+2; i++) {
         std::cout << v[i] << " " << u[i] << std::endl ;
     }
+
+    std::string filename = "data/vun100.txt";
+    w_file(filename, v, u);
+
     return 0;
 
 }
