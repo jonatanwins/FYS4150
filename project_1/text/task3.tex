@@ -1,0 +1,32 @@
+Let the interval be partitioned into $n$ intervals such that there are $n$+1 points including the endpoints. 
+
+From the homogenous Dirichlet boundary conditions we have that the endpoints $v_0 = v_{n+1} = 0$.
+
+%The discretized version of the Poisson equation expressed using the double derivative approximation:
+We approximate the second derivative with the central difference
+\begin{align}
+    \frac{d^2u}{dx^2}  &= \frac{u_{i+1} - 2u_{i} + u_{i-1}}{(\Delta x)^2} + O(\Delta x^2)  \\
+    \frac{d^2u}{dx^2} &\sim \frac{v_{i+1} - 2v_{i} + v_{i-1}}{(\Delta x)^2}
+    \label{derivative_approx}
+\end{align}
+
+Define $v_i$ as the discretized approximation to $u_i$ and $\Delta x$ as the step-length in the discretization. The result in Eq. \ref{derivative_approx} is derived from adding the Taylor Expansion for $x_{i+1} $ and $x_{i-1}$ around point $x_i$ for $\Delta x = h$: 
+\begin{align*}
+    u_{i+1} = u_i + u'h + \frac{1}{2}u''^2 + \frac{1}{6}u'''h^3 + O(h^4)\\
+    u_{i-1} = u_i - u'h + \frac{1}{2}u''h^2 - \frac{1}{6}u'''h^3 + O(h^4) 
+\end{align*}
+
+The elimination of odd powers explain the order of error $O(\Delta x^2)$. Combining Eq. \ref{poisson_eq} and \ref{derivative_approx} gives us the discretized Poisson equation on the general form:
+\begin{align}
+    - \frac{v_{i+1} + 2v_{i} - v_{i-1}}{(\Delta x)^2} =  f_i
+\end{align}
+
+In our specific example we have that $\Delta x = \frac{x_{max} - x_{min}}{n} = \frac{1}{n}$ for n steps which give $x_i = i \Delta x = \frac{i}{n}$ and $f_i = 100e^{-10x_i} = 100e^{-10(\frac{i}{n})}$. 
+
+And hence our specific Poisson equation can be discretized as:
+\begin{align}
+    - n^2(v_{i+1} + 2v_{i} - v_{i-1}) = -100e^{-10\frac{i}{n}}
+    \label{discretization}
+\end{align}
+
+

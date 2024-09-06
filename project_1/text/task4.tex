@@ -1,0 +1,71 @@
+
+If we denote the vector of unknowns in Eq. \ref{discretization} as \( \mathbf{v} = [v_1, v_2, \ldots, v_n]^T \), the system of equations can be represented in matrix form as:
+
+
+\begin{align}
+    A \mathbf{v} = \mathbf{g}
+    \label{Avg}
+\end{align}
+
+where
+$$
+    \g = \begin{pmatrix}
+(\Delta x)^2 f_1 + v_0 \\
+(\Delta x)^2 f_2 \\
+(\Delta x)^2 f_3 \\
+\vdots \\
+(\Delta x)^2 f_{n-1} \\
+(\Delta x)^2 f_n + v_{n+1}
+\end{pmatrix}
+
+$$
+
+%\( \mathbf{g} = \frac{100}{n^2} [e^{\frac{-10}{n}}, e^{\frac{-20}{n}}, \ldots, e^{-10}]^T \) 
+
+
+and \( \mathbf{A} \) is an \(n \times n\) tridiagonal matrix of the form:
+
+\[
+\mathbf{A} = \begin{pmatrix}
+2 & -1 & 0 & \cdots & 0 \\
+-1 & 2 & -1 & \cdots & 0 \\
+0 & -1 & 2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 2
+\end{pmatrix}
+\]
+
+This matrix \( \mathbf{A} \) has the subdiagonal, main diagonal, and superdiagonal specified by the signature \( (-1, 2, -1) \). Specifically, the elements of \( \mathbf{A} \) are related to the coefficients in the discretized Eq. \ref{discretization} as follows:
+
+- The main diagonal elements \( A_{ii} \) correspond to the coefficient of \( b_i \), which is \( 2 \).
+
+- The subdiagonal elements \( A_{i,i-1} \) and the superdiagonal elements \( A_{i,i+1} \) correspond to the coefficients of \( a_{i} \) and \( c_{i} \), respectively, which are \( -1 \).
+
+Therefore, the matrix equation for the discretized system is:
+
+\[
+\begin{pmatrix}
+2 & -1 & 0 & \cdots & 0 \\
+-1 & 2 & -1 & \cdots & 0 \\
+0 & -1 & 2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 2
+\end{pmatrix}
+\begin{pmatrix}
+v_1 \\
+v_2 \\
+v_3 \\
+\vdots \\
+v_n
+\end{pmatrix}
+=
+\begin{pmatrix}
+g_1 \\
+g_2 \\
+g_3 \\
+\vdots \\
+g_n
+\end{pmatrix}
+\]
+
+where the vector \( \mathbf{g} \) on the right-hand side represents the source terms modified by the grid spacing \( h^2 f_i \).

@@ -1,0 +1,22 @@
+
+We know that $(a_i, b_i, c_i) = (-1,2,-1)$ for all $i$, hence 
+$$
+    \tilde{b}_i = b_i - \frac{a_i}{\tilde{b}_{i-1}} c_{i-1}
+    = 2- \frac{1}{\tilde{b}_{i-1}}
+$$
+We claim that $\tilde{b}_n = \frac{n+1}{n}$
+\\\\
+Proof of claim:
+As a base case we have that $\tilde{b}_1 = b_1 = \frac{2}{1}$
+If we assume that $\tilde{b}_n = \frac{n+1}{n}$ then it follow that
+\begin{align*}
+    \tilde{b}_{n+1} &= 2- \frac{1}{\tilde{b}_{i-1}} \\
+    &= \frac{2n+2}{n+1} - \frac{n}{n+1} \\
+    &= \frac{n+2}{n+1}
+\end{align*}
+Hence by induction over $n$ we have shown that $\tilde{b}_n = \frac{n}{n+1}$
+
+The complexity of $\tilde{b}_n = \frac{n}{n+1}$ is 2 flops (addition and division) and the complexity of $\tilde{b}_i = b_i - \frac{a_i}{\tilde{b}_{i-1}} c_{i-1}$ is 4 flops, hence the loop has been reduced from 3(n-1) to 2(n-1) flops.
+
+The total FLOPs from the specilized algorithm is therefore reduced from $9(n-1)$ to  $8(n-1)$ calculations.
+
