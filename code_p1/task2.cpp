@@ -14,7 +14,7 @@ int main()
     }
 
 
-    // Write data out to data/outfile.txt
+    // Write data to output file
     std::string filename = "data/output.txt";
     w_file(filename, x, u);
     

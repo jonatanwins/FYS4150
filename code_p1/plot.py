@@ -38,12 +38,11 @@ for data in data_list:
         # given endpoints and steps = n + 1
         n.append(line_count - 3) 
         file.seek(0)  # Rewind file pointer back to the beginning
-        x = np.linspace(0,1,line_count) #np.zeros(line_count)
+        x = np.linspace(0,1,line_count) 
         u = np.zeros(line_count)
         v = np.zeros(line_count)
         for i, line in enumerate(file):
             ob = line.split()
-            #x[i] = (float(ob[0]))
             v[i] = (float(ob[0]))
             u[i] = (float(ob[1]))   
         x_list.append(x)

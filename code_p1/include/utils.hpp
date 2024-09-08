@@ -14,10 +14,7 @@
 
 
 
-// Below we give some function *declarations*.
-// The function *definitions* (the actual code) 
-// lives in src/utils.cpp
-
+// Function *declarations*.
 
 int w_file(const std::string& filename, const std::vector<double>& x, const std::vector<double>& u);
 int w_file_one(const std::string& filename, const std::vector<int>& x, const std::vector<double>& u, const std::vector<double>& v);

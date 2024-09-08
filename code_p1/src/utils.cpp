@@ -20,28 +20,22 @@ int w_file(const std::string& filename, const std::vector<double>& x, const std:
   // Close the output file
   ofile.close();
 
-  // All is well. Exit program with return code 0.
   return 0;
 }
 
 int w_file_one(const std::string& filename, const std::vector<int>& x, const std::vector<double>& u, const std::vector<double>& v)
 {
-  // Create an "output file stream" (type std::ofstream)
-  // and connect it to our filename.
   std::ofstream ofile;
   ofile.open(filename);
 
-  // Send vectors to output file
   int prec = 10;
   for (size_t i = 0; i < x.size(); i++)
   {
     ofile << std::setprecision(prec) << std::scientific << x[i] << ' ' << u[i]  << ' ' << v[i] << std::endl;
   } 
   
-  // Close the output file
   ofile.close();
 
-  // All is well. Exit program with return code 0.
   return 0;
 }
 
@@ -77,7 +71,7 @@ std::pair<std::vector<double>, std::vector<double>> forwardSubstitution(const st
 }
 
 
-// Forward substitution function simplified
+// Forward substitution function for the special algorithm
 
 std::pair<std::vector<double>, std::vector<double>> forwardSubstitution_special(const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c, const std::vector<double>& f, double v_0, double v_n_plus_1 ) {
 
@@ -107,7 +101,6 @@ std::pair<std::vector<double>, std::vector<double>> forwardSubstitution_special(
 
     return {gtilde, btilde};   
 }
-
 
 // Backward substitution function
 

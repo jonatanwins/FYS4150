@@ -25,23 +25,18 @@ int main() {
         // Exact solution
         std::vector<double> u = exactSolution(n);
 
-        auto start = std::chrono::high_resolution_clock::now();
-
         // General method
+
+        auto start = std::chrono::high_resolution_clock::now();
         std::vector<double> v = solveTridiagonalMatrixEquation(a, b, c, f, v_0, v_n_plus_1);
-
         auto end = std::chrono::high_resolution_clock::now();
-
         std::chrono::duration<double> runtime = end - start;
         runtimes[i] = runtime.count();
 
-        auto start_special = std::chrono::high_resolution_clock::now();
-
         // Special method
+        auto start_special = std::chrono::high_resolution_clock::now();
         std::vector<double> v_special = solveTridiagonalMatrixEquation_special(a, b, c, f, v_0, v_n_plus_1);   
-
         auto end_special = std::chrono::high_resolution_clock::now();
-
         std::chrono::duration<double> runtime_spec = end_special - start_special;
         runtimes_special[i] = runtime_spec.count();
 
