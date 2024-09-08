@@ -19,7 +19,7 @@ ax.set_xlabel('x')
 ax.set_ylabel('u(x)')
 ax.set_title(r'$u(x) = 1 - (1 - e^{-10})x - e^{-10x}$')
 ax.legend()
-plt.savefig('plot_t2.pdf')
+plt.savefig('plots/plot_t2.pdf')
 plt.show()
 
 
@@ -64,7 +64,7 @@ for i in range(len(n)):
 ax.set_xlabel(r'x_i')
 ax.set_ylabel('y')
 ax.legend()
-plt.savefig('plot_7.pdf')
+plt.savefig('plots/plot_7.pdf')
 plt.show()
 
 
@@ -72,9 +72,6 @@ plt.show()
 
 #-----------------------------Task8--------------------------------------
 
-
-#print(x,u,v)
-#print(len(x),len(u), len(v))
 
 max_logRel = [] # Task 8c, plot comparison max_relativ error vs n_steps
 fig = plt.figure(figsize=(10,10))
@@ -111,7 +108,7 @@ ax2.set_xlabel(r'$x_i$')
 ax2.set_ylabel(r'$log_{10}(\epsilon_i)$')
 ax2.legend()
 ax2.grid()
-plt.savefig('plot_8.pdf')
+plt.savefig('plots/plot_8.pdf')
 plt.show()
 
 
@@ -123,23 +120,27 @@ ax.plot(np.log10(n),max_logRel, 'bo')
 ax.set_xlabel(r'$log_{10}(n_{steps})$')
 ax.set_ylabel(r'$Max(\epsilon_i)$')
 ax.grid()
-plt.savefig('plot_8_max.pdf')
+plt.savefig('plots/plot_8_max.pdf')
 
 # -----------------------Task 10-----------------------------
 
 n = []
 runtime = []
-with open('runtime.txt', 'r') as file:
+runtime_special = []
+with open('data/runtime', 'r') as file:
     for line in file:
         ob = line.split()
         n.append(float(ob[0]))
         runtime.append(float(ob[1]))
+        runtime_special.append(float(ob[2]))
         
 fig, ax = plt.subplots()
-ax.plot(n, runtime, linestyle='-', marker='*')
+ax.plot(n, runtime, linestyle='-', marker='*', label='General algorithm')
+ax.plot(n, runtime_special, linestyle='-', marker='o', label='Special algorithm')
 ax.set_xscale('log')
 ax.set_xlabel(r'$\log{n_{steps}}$')
 ax.set_ylabel('Runtime [s]')
 ax.set_title('Runtime')
-plt.savefig('plot_t10.pdf')
+plt.savefig('plots/plot_t10.pdf')
+plt.legend()
 plt.show()
