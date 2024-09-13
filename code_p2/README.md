@@ -10,7 +10,9 @@ Make sure to include a README file in the repo that briefly explains how the cod
 This is project 2 for FYS4150, TODO
 
 ## Features
-- TODO
+- Scaling of equations
+- Eigenvalue problems
+- Unit testing
 
 ## Installation
 Compiled with `c++11`.
