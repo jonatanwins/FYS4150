@@ -16,5 +16,7 @@
 
 
 // Function *declarations*.
+std::pair<arma::vec, arma::mat> analytical(int N, double d, double a);
+
 
 #endif  // end of include guard __utils_hpp__
