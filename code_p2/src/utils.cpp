@@ -2,9 +2,8 @@
 // the headers included in utils.hpp
 #include "utils.hpp"
 
-
 // Calculating eigenvals and eigenvec analytical
-td::pair<arma::vec, arma::mat> analytical(int N, double d, double a)
+std::pair<arma::vec, arma::mat> analytical(int N, double d, double a)
 {
     arma::vec eigval(N);
     arma::mat eigvec(N, N);

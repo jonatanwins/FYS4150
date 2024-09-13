@@ -1,15 +1,4 @@
-// Now we include headers we need
-#include <iostream>
-#include <iomanip> // scientific, setprecision()
-#include <vector>
-#include <string>
-#include <armadillo> 
-#include <cmath> // For M_PI
-
-
-
-// Function *declarations*.
-
+#include "utils.hpp" 
 
 int main()
 {
@@ -57,25 +46,4 @@ int main()
     return 0;
 }
 
-
-std::pair<arma::vec, arma::mat> analytical(int N, double d, double a)
-{
-    arma::vec eigval(N);
-    arma::mat eigvec(N, N);
-
-    for (size_t j = 0; j < N; j++)
-    {
-        eigval(j) = d + 2*a*cos((j+1) * M_PI / (N + 1));
-        for (size_t i = 0; i < N; i++)
-        {
-            eigvec(i,j) = sin((i+1) * (j+1) * M_PI / (N + 1));          
-        }
-        
-    } 
-    // Normalize unit norm, use negative values to fit with armadillo values
-    eigvec = - arma::normalise(eigvec);  
-
-    return {eigval, eigvec};
-}
-
-// Run: g++ task2.cpp -o task2.exe -L/ -larmadillo
+// Run Windows: g++ task2.cpp -o task2.exe -L/ -larmadillo

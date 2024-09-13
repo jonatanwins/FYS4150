@@ -12,6 +12,7 @@
 #include <fstream> // ofstream   (read text)
 #include <chrono>
 #include <armadillo>
+#include <assert.h>
 
 
 
