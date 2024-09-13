@@ -16,4 +16,4 @@ Compiled with `c++11`.
 On Unix, you can compile with `clang` or `g++` by using the following command:
 
 ```bash
-g++ code_p1/task<N>.cpp -Icode_p1/include -std=c++11 -o out && ./out
+g++ code_p1/task<N>.cpp code_p1/src/utils.cpp -I code_p1/include -std=c++11 -o out  && ./out
