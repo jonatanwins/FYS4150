@@ -3,7 +3,6 @@
 void jacobi_eigensolver(const arma::mat& A, double eps, arma::vec& eigenvalues, arma::mat& eigenvectors, 
                 const int maxiter, int& iterations, bool& converged)
 {
-
     arma::mat A_m = A;
     arma::mat A_m_plus_1 = A_m;
 
@@ -47,11 +46,13 @@ void jacobi_eigensolver(const arma::mat& A, double eps, arma::vec& eigenvalues, 
             if (i != k && i != l) {
                 A_m_plus_1(i,k) = A_m(i,k)*c - A_m(i,l)*s;
                 A_m_plus_1(k,i) = A_m_plus_1(i,k);
-         
                 A_m_plus_1(i,l) = A_m(i,l)*c + A_m(i,k)*s;
                 A_m_plus_1(l,i) = A_m_plus_1(i,l);
             } 
         }
+
+        A_m_plus_1(k,l) = 0;
+        A_m_plus_1(l,k) = 0;
         
         A_m = A_m_plus_1;
 
@@ -71,7 +72,6 @@ void jacobi_eigensolver(const arma::mat& A, double eps, arma::vec& eigenvalues, 
     eigenvectors = R_m; 
 
 }
-
 
 int main() {
 
