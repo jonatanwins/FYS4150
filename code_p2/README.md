@@ -15,9 +15,13 @@ This is project 2 for FYS4150, TODO
 - Unit testing
 
 ## Installation
-Compiled with `c++11`.
+Compiled with `c++14`.
 
 On Unix, you can compile with `clang` or `g++` by using the following command:
 
 ```bash
 g++ code_p2/task<N>.cpp -Icode_p1/include -std=c++11 -o out && ./out
+
+On windows, you can compile with 
+g++ task2.cpp -o task2.exe -L/ -larmadillo
+
