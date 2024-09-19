@@ -11,13 +11,6 @@ int main() {
 
     arma::mat A = create_tridiagonal(N, a, d);
 
-    // A = {
-    //     {1, 0, 0, 0.5},
-    //     {0, 1, -0.7, 0},
-    //     {0, -0.7, 1, 0},
-    //     {0.5, 0, 0, 1}
-    // };
-
     double eps = 1e-4;
     arma::vec eigenvalues;
     arma::mat eigenvectors;
@@ -26,12 +19,16 @@ int main() {
     bool converged = true;
 
     jacobi_eigensolver(A, eps, eigenvalues, eigenvectors, maxiter, iterations, converged);
-    // std::cout << "Eigenvalues: "<< eigenvalues << std::endl;
-    // std::cout << "Eigenvectors: "<< eigenvectors << std::endl;
-    // std::cout << "Iterations: "<< iterations << std::endl;
-    // std::cout << "Converged: "<< converged << std::endl;
+    
+    // Getting sorted indices for eigenvalues in decending order (as Armadillo and Analytical set)
+    arma::uvec sort_indices = arma::sort_index(eigenvalues, "ascend");
 
-    eigenvalues.print("Jacobi Rotation Eigvalues");
-    eigenvectors.print("Jacobi Rotation Eigenvectors");
+    // Sorting eigenvalues and eigenvectors 
+    arma::vec sorted_eigval = eigenvalues(sort_indices);
+    arma::mat sorted_eigvec = eigenvectors.cols(sort_indices);
+
+    sorted_eigval.print("Jacobi Rotation Eigvalues");
+    sorted_eigvec.print("Jacobi Rotation Eigenvectors");
 }
+
     
