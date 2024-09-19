@@ -15,13 +15,13 @@ int main() {
         double a = -1/std::pow(h,2);
         double d = 2/std::pow(h,2);
 
-        arma::mat A = create_tridiagonal(N[i], a, d);
+        // arma::mat A = create_tridiagonal(N[i], a, d);
 
         // Generate random N*N matrix
-        // arma::mat A = arma::mat(N, N).randn();  
+        arma::mat A = arma::mat(N[i], N[i]).randn();  
 
         // Symmetrize the matrix by reflecting the upper triangle to lower triangle
-        // A = arma::symmatu(A);  
+        A = arma::symmatu(A);  
 
         int iterations = 0;
         bool converged = true;
