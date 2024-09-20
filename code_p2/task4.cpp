@@ -2,13 +2,14 @@
 
 
 int main() {
-
+    // Variables
     int N = 6;
     double n = N + 1;
     double h = 1/n;
     double a = -1/std::pow(h,2);
     double d = 2/std::pow(h,2);
 
+    // Creating Tridiagonal matrix, see utils.cpp in src/
     arma::mat A = create_tridiagonal(N, a, d);
 
     double eps = 1e-4;
@@ -18,6 +19,7 @@ int main() {
     int iterations = 0;
     bool converged = true;
 
+    // Solving Jacobi Rotation Algorithm, see utils.cpp in src/
     jacobi_eigensolver(A, eps, eigenvalues, eigenvectors, maxiter, iterations, converged);
     
     // Getting sorted indices for eigenvalues in decending order (as Armadillo and Analytical set)

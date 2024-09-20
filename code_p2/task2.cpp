@@ -2,6 +2,7 @@
 
 int main()
 {
+    // Variables
     int N = 6;
     double n = N + 1;
     double h = 1/n;
@@ -9,12 +10,7 @@ int main()
     double d = 2/std::pow(h,2);
 
     arma::mat A = create_tridiagonal(N, a, d);
-    A = {
-        {1, 0, 0, 0.5},
-        {0, 1, -0.7, 0},
-        {0, -0.7, 1, 0},
-        {0.5, 0, 0, 1}
-    };
+    
 
     // Calculate eigenvals and eigenvec form Armadillo --------------------------------------------------
     arma::vec eigval;

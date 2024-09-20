@@ -26,9 +26,11 @@ int main() {
         int iterations = 0;
         bool converged = true;
 
-        // A.print();
+        // Solving Jacobi Rotation Algorithm, see utils.cpp in src/
+        // Calculation numbers of iterations
         jacobi_eigensolver(A, eps, eigenvalues, eigenvectors, maxiter, iterations, converged);
 
+        // Printing number of iterations
         std::cout << "N: "<< N[i] << " Iterations: "<< iterations << std::endl;
         std::cout << "Converged: "<< converged << std::endl;
     }
