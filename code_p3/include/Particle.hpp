@@ -7,12 +7,12 @@ class Particle {
     public:
     
         // Constructor
-        Particle(double m, double q, const arma::vec & pos, const arma::vec& vel);
+        Particle(double m, double q, const arma::vec & r, const arma::vec& v);
 
         // Attributes
-        double mass;
-        double charge;
-        arma::vec position;
-        arma::vec velocity; 
+        double m;
+        double q;
+        arma::vec r;
+        arma::vec v; 
 };
 

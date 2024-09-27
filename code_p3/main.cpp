@@ -2,7 +2,7 @@
 
 // -------------------------------------- Constants ------------------------------------
 // Coulomb constant 
-double ke = 1.38935333e5; // (μm)^3 / (μs)^2 e^2
+double k_e = 1.38935333e5; // (μm)^3 / (μs)^2 e^2
 
 // Magnetic field strength (Tesla) and electric potential (Volt)
 double T_unit = 9.64852558e1; // μm / (μs * e)
