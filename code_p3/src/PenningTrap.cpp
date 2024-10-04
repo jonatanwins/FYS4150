@@ -4,8 +4,8 @@
 #include "constants.hpp"
 #include <vector>
 
-PenningTrap::PenningTrap(double B0_in, double V0_in, double d_in)
-    : B0(B0_in), V0(V0_in), d(d_in), particles() {
+PenningTrap::PenningTrap(double B0_in, double V0_in, double d_in, bool interaction_in)
+    : B0(B0_in), V0(V0_in), d(d_in), particles(), interaction(interaction_in) {
 }
 
 
@@ -106,8 +106,12 @@ arma::vec PenningTrap::total_force_particles(int i){
 // The total force on particle_i from both external fields and other particles
 arma::vec PenningTrap::total_force(int i){
 
-    arma::vec force_particles = PenningTrap::total_force_particles(i);
     arma::vec external_forces = PenningTrap::total_force_external(i);
+
+    arma::vec force_particles = {0.0, 0.0, 0.0};
+    if (this->interaction == true) {
+        force_particles = PenningTrap::total_force_particles(i);
+    }
 
     arma::vec total_forces = force_particles + external_forces;
 
@@ -184,30 +188,47 @@ void PenningTrap::evolve_forward_Euler(double dt){
 
 }  
 
-void PenningTrap::save_to_file(const std::string& filename, double t, int num_particles, int num_timesteps) {
-    std::ofstream ofile(filename, std::ios::app); 
-    //  TODO clean up what chatgpt has written 
+void PenningTrap::save_metadata(int num_particles, int num_timesteps, std::string filename) {
+    std::ofstream ofile(filename, std::ios::app);
 
     if (!ofile.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
         return; 
     }
 
-    if (ofile.tellp() == 0) { // If file is empty
-        ofile << num_particles << " " << num_timesteps << std::endl; // Write only once
+    if (ofile.tellp() == 0) {
+        ofile << num_particles << " " << num_timesteps << std::endl; 
+    }
+    else {
+        throw std::runtime_error("Error: Cannot add metadata to nonempty file, " + filename + " is not empty.");
+    }
+}
+
+void PenningTrap::save_to_file(const std::string& filename, double t) {
+    
+    // open file in append mode
+    std::ofstream ofile(filename, std::ios::app); 
+    //  TODO clean up what chatgpt has written 
+
+    // print error message if problems with opening file
+    if (!ofile.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return; 
     }
 
+    // write time to file
     ofile << t << std::endl;
 
+    // write particle data to file
     int precision = 10; 
-    for (size_t i = 0; i < particles.size(); i++) {
+    for (int i = 0; i < particles.size(); i++) {
         const auto& particle = particles[i];
 
-        for (size_t k = 0; k < particle.r.n_elem; k++) {
+        for (int k = 0; k < particle.r.n_elem; k++) {
             ofile << std::setprecision(precision) << std::scientific << particle.r(k) << " "; 
         }
 
-        for (size_t k = 0; k < particle.v.n_elem; k++) {
+        for (int k = 0; k < particle.v.n_elem; k++) {
             ofile << std::setprecision(precision) << std::scientific << particle.v(k) << " "; 
         }
 

@@ -1,14 +1,16 @@
 #include "utils.hpp"
 #include "PenningTrap.hpp"
 #include "Particle.hpp"
+#include "constants.hpp"
 
 
 int main(){
-    double B0 = 1;
-    double V0 = 1;
-    double d  = 1;
-    double timesteps = 50;
-    double dt = 0.01;
+    double B0 = B0_converted;
+    double V0 = V0_converted;
+    double d  = d_const;
+    double tot_time = 0.00005;
+    double timesteps = 30;
+    double dt = tot_time/timesteps;
     
     double mass = 1.0;
     double charge = -1.0;
@@ -20,20 +22,25 @@ int main(){
     arma::vec position2 = {0.0, 1.0, 1.0};
     arma::vec velocity2 = {1.0, 2.0, 1.0};
 
+    bool interaction = false;
+    int num_particles = 1;
+
     Particle electron1 = Particle(mass, charge, position, velocity);
     Particle electron2 = Particle(mass2, charge2, position2, velocity2);
 
-    PenningTrap Trap(B0, V0, d);
-    Trap.add_particle(electron1);
-    Trap.add_particle(electron2);
+    PenningTrap trap(B0, V0, d, interaction);
+    trap.add_particle(electron1);
+    //trap.add_particle(electron2);
 
-    std::string filename = "data/testing.txt";
+    std::string filename = "data/testing_for_benjamin_one_particle.txt";
     std::ofstream ofile(filename, std::ios::trunc);
     ofile.close(); 
 
-    for (int i = 0; i < timesteps; i++) {
-        Trap.evolve_RK4(dt); 
-        Trap.save_to_file(filename, i*dt, 2, timesteps); 
+    trap.save_metadata(num_particles, timesteps+1, filename);
+
+    for (int i = 0; i <= timesteps; i++) {
+        trap.save_to_file(filename, i*dt); 
+        trap.evolve_RK4(dt); 
     }
 
     return 0;

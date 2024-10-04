@@ -6,13 +6,14 @@ class PenningTrap {
     public:
 
         // Constructor
-        PenningTrap(double B0_in, double V0_in, double d_in);
+        PenningTrap(double B0_in, double V0_in, double d_in, bool interaction_in = true);
 
         // Attributes
         double B0;
         double V0;
         double d;
         std::vector<Particle> particles;
+        bool interaction;
 
          // Add a particle to the trap
         void add_particle(Particle p_in);
@@ -41,7 +42,9 @@ class PenningTrap {
         // Evolve the system one time step (dt) using Forward Euler
         void evolve_forward_Euler(double dt);
 
-        void save_to_file(const std::string& filename, double t, int num_particles, int num_timesteps);
+        void save_metadata(int num_particles, int num_timesteps, std::string filename);
+
+        void save_to_file(const std::string& filename, double t);
 
 };
 // 
