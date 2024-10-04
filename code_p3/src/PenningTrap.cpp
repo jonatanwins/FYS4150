@@ -55,10 +55,8 @@ arma::vec PenningTrap::force_particle(int i, int j){
 
     double r_diff_norm = arma::norm(r_diff);
 
-    // double k_e = 1.38935333e5;
-
     arma::vec force_ij = (k_e * q_i * q_j)/std::pow(r_diff_norm,3) * r_diff;
-
+        
     return force_ij;
     
 }
@@ -83,11 +81,15 @@ arma::vec PenningTrap::total_force_external(int i){
 // The total force on particle_i from the other particles
 arma::vec PenningTrap::total_force_particles(int i){
 
+    
+
     arma::vec force_particles = arma::vec({0.0, 0.0, 0.0});
+
     // loop over all other particles j
     for (int j = 0; j < particles.size(); j++){
 
         arma::vec force_ij = PenningTrap::force_particle(i,j);
+        std::cout << "force ij" << force_ij << std::endl;
         // add to force_particles
         force_particles += force_ij;
     }
@@ -101,6 +103,8 @@ arma::vec PenningTrap::total_force(int i){
 
     arma::vec force_particles = PenningTrap::total_force_particles(i);
     arma::vec external_forces = PenningTrap::total_force_external(i);
+
+    //std::cout << "force particles: " << force_particles << std::endl;
 
     arma::vec total_forces = force_particles + external_forces;
 
@@ -125,11 +129,9 @@ void PenningTrap::evolve_RK4(double dt){
 
     // update after k1 
     for (int j = 0; j < particles.size(); j++) {
-        particles.at(j).r = particles_copy.at(j).r + 0.5 * dt * k_r_1;
-        particles.at(j).v = particles_copy.at(j).v + 0.5 * dt * k_v_1;
+        particles.at(j).r = particles_copy.at(j).r + 0.5 * k_r_1;
+        particles.at(j).v = particles_copy.at(j).v + 0.5 * k_v_1;
     } 
-
-    // need to update time??? t += dt/2
 
     // k2 
     for (int j = 0; j < particles.size(); j++){
@@ -139,11 +141,9 @@ void PenningTrap::evolve_RK4(double dt){
 
     // update after k2
     for (int j = 0; j < particles.size(); j++) {
-        particles.at(j).r = particles_copy.at(j).r + 0.5 * dt * k_r_2;
-        particles.at(j).v = particles_copy.at(j).v + 0.5 * dt * k_v_2;
+        particles.at(j).r = particles_copy.at(j).r + 0.5 * k_r_2;
+        particles.at(j).v = particles_copy.at(j).v + 0.5 * k_v_2;
     } 
-    
-    // need to update time??? t += dt/2
 
     // k3 
     for (int j = 0; j < particles.size(); j++){
@@ -153,11 +153,9 @@ void PenningTrap::evolve_RK4(double dt){
 
     // update after k3
     for (int j = 0; j < particles.size(); j++) {
-        particles.at(j).r = particles_copy.at(j).r + dt * k_r_3;
-        particles.at(j).v = particles_copy.at(j).v + dt * k_v_3;
+        particles.at(j).r = particles_copy.at(j).r + k_r_3;
+        particles.at(j).v = particles_copy.at(j).v + k_v_3;
     }  
-
-    // need to update time??? t += dt
 
     // k4
     for (int j = 0; j < particles.size(); j++){
@@ -179,6 +177,7 @@ void PenningTrap::evolve_forward_Euler(double dt){
     for (int j = 0; j < particles.size(); j++){
         particles.at(j).r = particles.at(j).r + dt * particles.at(j).v;
         particles.at(j).v = particles.at(j).v + dt * PenningTrap::total_force(j)/particles.at(j).m;
+        //std::cout << "tot force :" << PenningTrap::total_force(j) << std::endl;
     } 
 
 }  
