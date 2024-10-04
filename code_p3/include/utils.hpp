@@ -15,5 +15,4 @@
 
 
 
-
 #endif  // end of include guard __utils_hpp__

@@ -9,11 +9,11 @@ void init_particle() {
     arma::vec velocity = {1.0, 0.0, 0.0};
 
     Particle electron = Particle(mass, charge, position, velocity);
+    Particle antimatter = Particle(-7.9, -1.0, position, velocity);
+
     std::cout << "test for particle initialization passed" << std::endl;  
 }
 
-
-
-int main () {
+int main() {
     init_particle();
 } 

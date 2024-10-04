@@ -40,7 +40,8 @@ class PenningTrap {
 
         // Evolve the system one time step (dt) using Forward Euler
         void evolve_forward_Euler(double dt);
-                
+
+        void save_to_file(const std::string& filename, double t, int num_particles, int num_timesteps);
 
 };
 // 

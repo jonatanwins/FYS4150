@@ -2,6 +2,7 @@
 #include "PenningTrap.hpp"
 #include "Particle.hpp"
 #include "constants.hpp"
+#include <vector>
 
 PenningTrap::PenningTrap(double B0_in, double V0_in, double d_in)
     : B0(B0_in), V0(V0_in), d(d_in), particles() {
@@ -45,17 +46,21 @@ arma::vec PenningTrap::external_B_field(arma::vec r){
 arma::vec PenningTrap::force_particle(int i, int j){
     // Columb force = k_e * q_1 * q_2 / norm(r)^3 * vector of distance between 
 
-    arma::vec r_i = particles.at(i).r;
-    arma::vec r_j = particles.at(j).r;
+    arma::vec force_ij = {0.0, 0.0, 0.0};
 
-    double q_i = particles.at(i).q;
-    double q_j = particles.at(j).q;
+    if (i != j) {
+        arma::vec r_i = particles.at(i).r;
+        arma::vec r_j = particles.at(j).r;
 
-    arma::vec r_diff = r_i - r_j;
+        double q_i = particles.at(i).q;
+        double q_j = particles.at(j).q;
 
-    double r_diff_norm = arma::norm(r_diff);
+        arma::vec r_diff = r_i - r_j;
 
-    arma::vec force_ij = (k_e * q_i * q_j)/std::pow(r_diff_norm,3) * r_diff;
+        double r_diff_norm = arma::norm(r_diff);
+
+        force_ij = (k_e * q_i * q_j)/std::pow(r_diff_norm,3) * r_diff;
+    }
         
     return force_ij;
     
@@ -89,7 +94,7 @@ arma::vec PenningTrap::total_force_particles(int i){
     for (int j = 0; j < particles.size(); j++){
 
         arma::vec force_ij = PenningTrap::force_particle(i,j);
-        std::cout << "force ij" << force_ij << std::endl;
+
         // add to force_particles
         force_particles += force_ij;
     }
@@ -104,8 +109,6 @@ arma::vec PenningTrap::total_force(int i){
     arma::vec force_particles = PenningTrap::total_force_particles(i);
     arma::vec external_forces = PenningTrap::total_force_external(i);
 
-    //std::cout << "force particles: " << force_particles << std::endl;
-
     arma::vec total_forces = force_particles + external_forces;
 
     return total_forces;
@@ -118,14 +121,14 @@ void PenningTrap::evolve_RK4(double dt){
     std::vector<Particle> particles_copy = particles;
 
     // init 
-    arma::vec k_r_1, k_r_2, k_r_3, k_r_4;
-    arma::vec k_v_1, k_v_2, k_v_3, k_v_4;
+    arma::Col<double> k_r_1, k_r_2, k_r_3, k_r_4;
+    arma::Col<double> k_v_1, k_v_2, k_v_3, k_v_4;
 
     // k1 
     for (int j = 0; j < particles.size(); j++){
-        arma::vec k_r_1 = dt * particles_copy.at(j).v;
-        arma::vec k_v_1 = dt * PenningTrap::total_force(j)/particles_copy.at(j).m;
-    } 
+        k_r_1 = dt * particles_copy.at(j).v;
+        k_v_1 = dt * PenningTrap::total_force(j)/particles_copy.at(j).m;
+    }  
 
     // update after k1 
     for (int j = 0; j < particles.size(); j++) {
@@ -135,8 +138,8 @@ void PenningTrap::evolve_RK4(double dt){
 
     // k2 
     for (int j = 0; j < particles.size(); j++){
-        arma::vec k_r_2 = dt * particles.at(j).v;
-        arma::vec k_v_2 = dt * PenningTrap::total_force(j)/particles.at(j).m;
+        k_r_2 = dt * particles.at(j).v;
+        k_v_2 = dt * PenningTrap::total_force(j)/particles.at(j).m;
     } 
 
     // update after k2
@@ -147,8 +150,8 @@ void PenningTrap::evolve_RK4(double dt){
 
     // k3 
     for (int j = 0; j < particles.size(); j++){
-        arma::vec k_r_3 = dt * particles.at(j).v;
-        arma::vec k_v_3 = dt * PenningTrap::total_force(j)/particles.at(j).m;
+        k_r_3 = dt * particles.at(j).v;
+        k_v_3 = dt * PenningTrap::total_force(j)/particles.at(j).m;
     } 
 
     // update after k3
@@ -159,14 +162,14 @@ void PenningTrap::evolve_RK4(double dt){
 
     // k4
     for (int j = 0; j < particles.size(); j++){
-        arma::vec k_r_4 = dt * particles.at(j).v;
-        arma::vec k_v_4 = dt * PenningTrap::total_force(j)/particles.at(j).m;
+        k_r_4 = dt * particles.at(j).v;
+        k_v_4 = dt * PenningTrap::total_force(j)/particles.at(j).m;
     } 
 
     // final update 
     for (int j = 0; j < particles.size(); j++){
-        particles.at(j).r = particles_copy.at(j).r + (1/6) * (k_r_1 + 2*k_r_2 + 2*k_r_3 + k_r_4);
-        particles.at(j).v = particles_copy.at(j).v + (1/6) * (k_v_1 + 2*k_v_2 + 2*k_v_3 + k_v_4);
+        particles.at(j).r = particles_copy.at(j).r + (1.0/6.0) * (k_r_1 + 2.0*k_r_2 + 2.0*k_r_3 + k_r_4);
+        particles.at(j).v = particles_copy.at(j).v + (1.0/6.0) * (k_v_1 + 2.0*k_v_2 + 2.0*k_v_3 + k_v_4);
     } 
 
 } 
@@ -177,8 +180,40 @@ void PenningTrap::evolve_forward_Euler(double dt){
     for (int j = 0; j < particles.size(); j++){
         particles.at(j).r = particles.at(j).r + dt * particles.at(j).v;
         particles.at(j).v = particles.at(j).v + dt * PenningTrap::total_force(j)/particles.at(j).m;
-        //std::cout << "tot force :" << PenningTrap::total_force(j) << std::endl;
     } 
 
 }  
-        
+
+void PenningTrap::save_to_file(const std::string& filename, double t, int num_particles, int num_timesteps) {
+    std::ofstream ofile(filename, std::ios::app); 
+    //  TODO clean up what chatgpt has written 
+
+    if (!ofile.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return; 
+    }
+
+    if (ofile.tellp() == 0) { // If file is empty
+        ofile << num_particles << " " << num_timesteps << std::endl; // Write only once
+    }
+
+    ofile << t << std::endl;
+
+    int precision = 10; 
+    for (size_t i = 0; i < particles.size(); i++) {
+        const auto& particle = particles[i];
+
+        for (size_t k = 0; k < particle.r.n_elem; k++) {
+            ofile << std::setprecision(precision) << std::scientific << particle.r(k) << " "; 
+        }
+
+        for (size_t k = 0; k < particle.v.n_elem; k++) {
+            ofile << std::setprecision(precision) << std::scientific << particle.v(k) << " "; 
+        }
+
+        ofile << std::endl; 
+    }
+
+    ofile.close(); 
+}
+
