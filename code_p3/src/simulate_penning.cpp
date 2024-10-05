@@ -28,14 +28,13 @@ int simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int t
 
 
 int main() {
-    double timesteps = 51;
+    double timesteps = 50+1;
     double dt = 0.000001;
     arma::vec position = {20.0, 0.0, 20.0};
     arma::vec velocity = {0.0, 25.0, 0.0};
 
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
-
 
     // Simulate the movement of a single particle in Penning trap for a total time of 50µs.
     // Make a plot of the motion in the direction as a function of time.
@@ -48,5 +47,17 @@ int main() {
 
     // and without particle interactions
     simulate(particles, trap, dt, timesteps, "code_p3/data/two_particles_no_int.txt", false);
+
+    //  1 particle and simulation time 50µs. Run the simulation four times, using 4000, 8000, 16000, 32000 timesteps
+    particles.pop_back(); // remove second particle
+    for (const int& n : {4000, 8000, 16000, 32000}) {
+        std::ostringstream filename;
+        filename << "code_p3/data/one_particles_no_int_n=" << n << ".txt";
+
+        simulate(particles, trap, timesteps/n, n, filename.str(), true);
+    }
+
+    
+    // Do the same using the forward Euler method.
 
 }
