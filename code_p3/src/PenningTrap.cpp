@@ -86,6 +86,11 @@ arma::vec PenningTrap::total_force_external(int i){
     arma::vec E_field = PenningTrap::external_E_field(r_i);
     arma::vec B_field = PenningTrap::external_B_field(r_i);
 
+    if (arma::norm(r_i) > d) {
+        E_field = {0.0, 0.0, 0.0};
+        B_field = {0.0, 0.0, 0.0};
+    }
+
     arma::vec external_forces = q_i * E_field + arma::cross(q_i * v_i, B_field);
 
     return external_forces;
