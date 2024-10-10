@@ -4,7 +4,7 @@
 #include "constants.hpp"
 
 int simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int timesteps, 
-        std::string filename, bool interactions = true, std::string method = "RK4") {
+        std::string filename, bool interactions = true, std::string method = "RK4", bool time_dependent_E = false) {
 
     for (const Particle& particle : particles) {
         trap.add_particle(particle);
@@ -52,11 +52,11 @@ int main() {
 
     // Simulate the movement of a single particle in Penning trap for a total time of 50µs.
     // Make a plot of the motion in the direction as a function of time.
-    particles.push_back(Particle(1.0, -1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. electron
+    particles.push_back(Particle(1.0, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
     simulate(particles, trap, dt, timesteps, "code_p3/data/one_particle_int_RK4.txt", true);
 
     // Simulate two particles in your Penning trap and make a plot of their motion in the xy-plane with and without particle interactions.
-    particles.push_back(Particle(1.0, -1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. electron
+    particles.push_back(Particle(1.0, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
     simulate(particles, trap, dt, timesteps, "code_p3/data/two_particles_int_RK4.txt", true);
 
     // and without particle interactions
@@ -67,13 +67,19 @@ int main() {
     particles.pop_back(); // remove second particle
     for (const int& n : {4000, 8000, 16000, 32000}) {
         std::ostringstream filename;
-        filename << "code_p3/data/one_particles_no_int_n=" << n << "_RK4.txt";
+        filename << "code_p3/data/one_particle_no_int_n=" << n << "_RK4.txt";
         simulate(particles, trap, timesteps/n, n, filename.str(), true, "RK4");
         
         filename.str("");
         
-        filename << "code_p3/data/one_particles_no_int_n=" << n << "_euler.txt";
+        filename << "code_p3/data/one_particle_no_int_n=" << n << "_euler.txt";
         simulate(particles, trap, timesteps/n, n, filename.str(), true, "euler");
     }
+
+    // task 9
+    // Implement a check that sets the external E- and B-fields to zero in the region outside the trap. 
+    // We’ll use the characteristic distance as a simple measure for the trap size, 
+    // so what we need is a check that sets the external fields E and B to zero when |r| > d.
+
 
 }

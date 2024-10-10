@@ -16,12 +16,19 @@ void PenningTrap::add_particle(Particle p_in){
 
 } 
 
+double time_dependant_V0(double t, double V0) {
+    V0_dep = V0*(1+f*arma::cos( w_v * t));
+    return V0_dep;
+}
+
 // External electric field at point r=(x,y,z)
 arma::vec PenningTrap::external_E_field(arma::vec r){
 
     double x = r.at(0);
     double y = r.at(1);
     double z = r.at(2);
+
+    /* if time dependant this->V0 = V0(...)*/
 
     // E as the gradient of V
     double Ex = (this->V0*x) / (std::pow(this->d,2));

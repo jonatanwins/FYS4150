@@ -3,6 +3,13 @@
 #include "Particle.hpp"
 #include "constants.hpp"
 
+void check_outside_region() {
+    // task 9
+    // Implement a check that sets the external E- and B-fields to zero in the region outside the trap. 
+    // We’ll use the characteristic distance as a simple measure for the trap size, 
+    // so what we need is a check that sets the external fields E and B to zero when |r| > d.
+}
+
 
 int main(){
     double B0 = B0_converted;
@@ -47,5 +54,5 @@ int main(){
 }
 
 
-//  g++ tests/test_penning.cpp src/utils.cpp src/Particle.cpp  src/PenningTrap.cpp -I include -o out -std=c++14 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
+//  g++ src/simulate_penning.cpp src/utils.cpp src/Particle.cpp  src/PenningTrap.cpp -I include -o out -std=c++14 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
 
