@@ -15,8 +15,16 @@ class PenningTrap {
         std::vector<Particle> particles;
         bool interaction;
 
-         // Add a particle to the trap
+        // uninitialized
+        double f;
+        double w_v;
+
+        // Methods
+        void set_time_dependent_params(double f_in, double w_v_in);
+
         void add_particle(Particle p_in);
+
+        void update_time_dependent_V0(double t);
 
         // External electric field at point r=(x,y,z)
         arma::vec external_E_field(arma::vec r);  
