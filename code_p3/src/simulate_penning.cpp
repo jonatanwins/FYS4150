@@ -26,7 +26,7 @@ int simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int t
         }
     }
     
-    else if(method == "euler") {
+    else if(method == "FE") {
         for (int i = 0; i < timesteps; i++) {
         trap.evolve_forward_Euler(dt);
         trap.save_to_file(filename, i*dt);
@@ -34,7 +34,7 @@ int simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int t
     }
 
     else {
-        std::cout << "Error: method for numerical differentiation must be RK4 or euler." << std::endl; 
+        std::cout << "Error: method for numerical differentiation must be RK4 or FE." << std::endl; 
     }
 
     return 0;
@@ -72,8 +72,8 @@ int main() {
         
         filename.str("");
         
-        filename << "code_p3/data/one_particle_no_int_n=" << n << "_euler.txt";
-        simulate(particles, trap, timesteps/n, n, filename.str(), true, "euler");
+        filename << "code_p3/data/one_particle_no_int_n=" << n << "_FE.txt";
+        simulate(particles, trap, timesteps/n, n, filename.str(), true, "FE");
     }
 
     // task 9
