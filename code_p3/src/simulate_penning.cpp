@@ -86,6 +86,14 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
     }
 }
 
+void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTrap trap) {
+    double time = 500;
+    double dt = 0.01;
+    int timesteps = time/dt;
+
+    simulate(particles, trap, dt, timesteps, "data/one_particle_int_RK4_time_dep.txt", true, "RK4", true);
+}
+
 
 int main() {
     create_directories();
@@ -95,7 +103,7 @@ int main() {
     particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
 
     // task 8
-    simulate_traps_constant_E(particles, trap);
+    // simulate_traps_constant_E(particles, trap);
 
 
 
@@ -104,5 +112,6 @@ int main() {
     // We’ll use the characteristic distance as a simple measure for the trap size, 
     // so what we need is a check that sets the external fields E and B to zero when |r| > d.
     trap.set_time_dependent_params(0.1, 0.2);
+    simulate_traps_time_dependent_E(particles, trap);
 
     }

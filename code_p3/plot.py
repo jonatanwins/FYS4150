@@ -73,7 +73,7 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
     t_anl, z_anl = single_z_anl(wz, r0, t_max, N_points)
 
 
-    filename = "one_particle_int_RK4.txt"
+    filename = "one_particle_int_RK4_time_dep.txt"
     t, r, v, n = read_file(filename)
 
     # ------------------------------- Plotting motion z -------------------------------
@@ -295,4 +295,4 @@ if __name__ == "__main__":
 
     # -------------------------------------   2 Particles ----------------------------------
 
-    two_particles(interactions, double_xy, double_xv, double_zv, double_xyz)
+    # two_particles(interactions, double_xy, double_xv, double_zv, double_xyz)
