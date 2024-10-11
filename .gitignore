@@ -588,10 +588,11 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,linux,windows,jupyternotebooks,python,latex,visualstudiocode
 
-# stupid as git
+# stupid ass git
 .vimrc
 
 # For C++ projects
 .vscode
 out
-run.sh
+data
+plots
