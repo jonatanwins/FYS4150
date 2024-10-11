@@ -2,6 +2,15 @@
 #include "PenningTrap.hpp"
 #include "Particle.hpp"
 #include "constants.hpp"
+#include <filesystem>
+
+void create_directories() {
+    std::vector<std::string> dirs = {"data", "plots"};
+    
+    for (const std::string& dir : dirs) {
+        std::filesystem::create_directories(dir);
+    }
+}
 
 void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int timesteps, 
         std::string filename, bool interactions = true, std::string method = "RK4", bool time_dependent_E = false) {
@@ -52,26 +61,26 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
 
     // Simulate the movement of a single particle in Penning trap for a total time of 50µs.
     // Make a plot of the motion in the direction as a function of time.
-    simulate(particles, trap, dt, timesteps, "code_p3/data/one_particle_int_RK4.txt", true);
+    simulate(particles, trap, dt, timesteps, "data/one_particle_int_RK4.txt", true);
 
     // Simulate two particles in your Penning trap and make a plot of their motion in the xy-plane with and without particle interactions.
     particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
-    simulate(particles, trap, dt, timesteps, "code_p3/data/two_particles_int_RK4.txt", true);
+    simulate(particles, trap, dt, timesteps, "data/two_particles_int_RK4.txt", true);
 
     // and without particle interactions
-    simulate(particles, trap, dt, timesteps, "code_p3/data/two_particles_no_int_RK4.txt", false);
+    simulate(particles, trap, dt, timesteps, "data/two_particles_no_int_RK4.txt", false);
 
     //  1 particle and simulation time 50µs. Run the simulation four times, using 4000, 8000, 16000, 32000 timesteps
     // Do the same using the forward Euler method.
     particles.pop_back(); // remove second particle
     for (const int& n : {4000, 8000, 16000, 32000}) {
         std::ostringstream filename;
-        filename << "code_p3/data/one_particle_no_int_n=" << n << "_RK4.txt";
+        filename << "data/one_particle_no_int_n=" << n << "_RK4.txt";
         simulate(particles, trap, timesteps/n, n, filename.str(), true, "RK4");
         
         filename.str("");
         
-        filename << "code_p3/data/one_particle_no_int_n=" << n << "_FE.txt";
+        filename << "data/one_particle_no_int_n=" << n << "_FE.txt";
         simulate(particles, trap, timesteps/n, n, filename.str(), true, "FE");
     
     }
@@ -79,12 +88,16 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
 
 
 int main() {
+    create_directories();
+
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
     particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
 
     // task 8
     simulate_traps_constant_E(particles, trap);
+
+
 
     // task 9
     // Implement a check that sets the external E- and B-fields to zero in the region outside the trap. 
