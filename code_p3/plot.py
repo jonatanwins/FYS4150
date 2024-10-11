@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-#from pathlib import Path
+from pathlib import Path
 
 
 fsize = 18
@@ -41,14 +40,14 @@ def read_file(filename):
     
 def single_z_anl(wz,r0,t_max,N):
     z0 = r0[2]
-    t= np.linspace(0, t_max, N)
+    t= np.linspace(0, t_max, N) 
     z = z0 * np.cos(wz * t)
     return t, z
 
 def single_xy_anl(wz,w0,r0,v0, phi_p,phi_m,t_max,N):
     v0 = np.sqrt(v0[0]**2 + v0[1]**2)
     x0 = r0[0]
-    t = np.linspace(0, t_max, N)
+    t = np.linspace(0, t_max, N) 
 
     omega_plus = (w0 + np.sqrt(w0**2 - 2 * wz**2)) / 2
     omega_minus = (w0 - np.sqrt(w0**2 - 2 * wz**2)) / 2
@@ -70,11 +69,11 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
 
     # --------------------------- Analytical Solution ---------------------
     N_points = 1001
-    t_max = 50  # micro-seconds
+    t_max = tot_time #50e-6  # s
     t_anl, z_anl = single_z_anl(wz, r0, t_max, N_points)
 
 
-    filename = "one_particle_no_int_RK4.txt"
+    filename = "one_particle_int_RK4.txt"
     t, r, v, n = read_file(filename)
 
     # ------------------------------- Plotting motion z -------------------------------
@@ -83,9 +82,9 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
     ax = fig.add_subplot(1,1,1)
 
     # plot in micro-seconds/meters
-    #t_anl, z_anl = t_anl*1e6, z_anl*1e6
+    #t, z, t_anl, z_anl = t*1e6, z*1e6, t_anl*1e6, z_anl*1e6
     ax.plot(t_anl, z_anl, label=r'$z_{analytical}$')
-    ax.plot(t    , r[0,:,2]    , label=r'$z$' )
+    ax.plot(t, r[0,:,2], label=r'$z$', linestyle='--')
 
     ax.set_xlabel(r't $[\mu s]$', fontsize = fsize2) 
     ax.set_ylabel(r'z $[\mu m]$', fontsize = fsize2)
@@ -98,68 +97,47 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
 
 
     # ------------------------------- Plotting Rel. Error -------------------------------
-    # For both FE and RK4
-    
+    fig = plt.figure(figsize=(6,6))
+    fig.suptitle('Relative Error, Single particle', fontsize = fsize)
+    ax = fig.add_subplot(1,1,1)
 
-    #solver_list = ["euler", "RK4"]
-    solver_list = ["RK4"]
+    # ----- Calculate rel. err -------
     n_list = [4000, 8000, 16000, 32000] # timesteps
+    for i in range(len(n_list)):
+        N = n_list[i]+1 #should be +1, fix
+        t_anl, z_anl = single_z_anl(wz,r0,t_max,N)
+        t_anl, x_anl, y_anl = single_xy_anl(wz,w0,r0,v0,phi_p,phi_m,t_max,N)
+        r_anl = np.array([x_anl,y_anl,z_anl]).T
 
-    # Create lists for calculating error convergence rate
-    h_list     = np.zeros((len(solver_list), len(n_list) ))
-    delta_list = np.zeros((len(solver_list), len(n_list) ))
-    r_err_con  = np.zeros(len(solver_list))
+        filename = "one_particle_no_int_n=" + str(n_list[i]) + "_RK4.txt"
+        t, r, v, n = read_file(filename)
 
-    for i, solver in enumerate(solver_list):
-        fig = plt.figure(figsize=(6,6))
-        fig.suptitle(f'Relative Error, Single particle, {solver}', fontsize = fsize)
-        ax = fig.add_subplot(1,1,1)
+        eps   = 1e-15 # buffer - not divide by zero
+        r = r[0,:,:]
+        r_err = np.linalg.norm(r-r_anl, axis=1) / (np.linalg.norm(r_anl, axis=1) + eps)
 
-        for j in range(len(n_list)):
-            N = n_list[j] + 1 
-            t_anl, z_anl = single_z_anl(wz,r0,t_max,N)
-            t_anl, x_anl, y_anl = single_xy_anl(wz,w0,r0,v0,phi_p,phi_m,t_max,N)
-            r_anl = np.array([x_anl,y_anl,z_anl]).T
-
-            filename = "one_particle_no_int_n=" + str(n_list[j]) + "_" + solver + ".txt"
-            t, r, v, n = read_file(filename)
-            
-            # ----------- Calculate rel. err ----------
-            eps   = 1e-15 # buffer - not divide by zero
-            r = r[0,:,:]
-            r_err = np.linalg.norm(r-r_anl, axis=1) / (np.linalg.norm(r_anl, axis=1) + eps)
-
-            ax.plot(t_anl, r_err, label=f'Rel. Err, n = {N-1}')
-            
-            h_list[i,j]     = 50 / n_list[j] # micro-seconds
-            delta_list[i,j] = max(np.linalg.norm(r-r_anl, axis=1))
+        ax.plot(t_anl, r_err, label=f'Rel. Err, n = {N-1}')
 
 
-        ax.set_xlabel(r't $[\mu s]$', fontsize = fsize2) 
-        ax.set_ylabel(r'Rel. Error $[]$', fontsize = fsize2)
-        ax.legend()
+    # plot in micro-seconds/meters
+    #ax.plot(t_anl, z_anl, label=r'$z_{analytical}$')
+    #ax.plot(t    , r[0,:,2]    , label=r'$z$' )
 
-        plt.tight_layout()
-        plt.legend()
-        plt.grid()
-        plt.savefig("plots/one_rel_err" + solver + ".pdf")
-        plt.show()
+    ax.set_xlabel(r't $[\mu s]$', fontsize = fsize2) 
+    ax.set_ylabel(r'Rel. Error $[]$', fontsize = fsize2)
+    ax.legend()
 
-        # ------------------------------ Error convergence rate ---------------------------
-        print(h_list)
-        print(delta_list)
-        for i in range(len(solver_list)):
-            for j in range(1, len(n_list)):
-                r_err_con += 1/3 * np.log10( delta_list[i,j] / delta_list[i,j-1] ) / np.log10( h_list[i,j] / h_list[i,j-1] )
-        
-        for i in range(len(solver_list)):
-            print('------------------------- Error Convergence Rate, r_err --------------------')
-            print(f'Solver: {solver_list[i]} \n r_err = {r_err_con[i]:.3e} \n \n \n')
+    plt.tight_layout()
+    plt.legend()
+    plt.grid()
+    plt.savefig("plots/one_rel_err.pdf")
+    plt.show()
 
 
-def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
+def two_particles(interactions, double_xy, double_xv, double_zv, double_xyz):
     # ------------------------------- Read file -----------------------------
     if interactions:  # with interactions
+        #filename = "two_particle_int.txt"
         filename = "two_particles_int_RK4.txt"
         add = "_int" 
     else: # without interactions
@@ -175,10 +153,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
     # ------------------------------- Plotting -------------------------------
     if double_xy:
         fig = plt.figure(figsize=(7,7))
-        if interactions:
-            fig.suptitle('2 Particles, xy-plane, with interaction', fontsize = fsize)
-        else:
-            fig.suptitle('2 Particles, xy-plane, without interaction', fontsize = fsize)
+        fig.suptitle('2 Particles, xy-plane', fontsize = fsize)
         ax = fig.add_subplot(1,1,1)
 
         for n in range(n_particles):
@@ -186,21 +161,17 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
 
         ax.set_xlabel(r'x $[\mu m]$') 
         ax.set_ylabel(r'y $[\mu m]$')
-        ax.set_xlim(-d,d)
-        ax.set_ylim(-d,d)
+        ax.legend()
+
         ax.legend()
         ax.grid()
-        #ax.axis('equal')
         plt.tight_layout()
         plt.savefig("plots/two_xy" + add + ".pdf")
 
     
     if double_xv:
         fig = plt.figure(figsize=(7,7))
-        if interactions:
-            fig.suptitle(r'2 Particles, $x v_x$-plane, with interaction', fontsize = fsize)
-        else:
-            fig.suptitle(r'2 Particles, $x v_x$-plane, without interaction', fontsize = fsize)
+        fig.suptitle(r'2 Particles, $x v_x$-plane', fontsize = fsize)
         ax = fig.add_subplot(1,1,1)
 
         # plot in micro-seconds/meters
@@ -212,6 +183,8 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         ax.set_xlabel(r'x $[\mu m]$') 
         ax.set_ylabel(r'$v_x$ $[\frac{m}{s}]$')
         ax.legend()
+
+        ax.legend()
         ax.grid()
         plt.tight_layout()
         plt.savefig("plots/two_xv" + add + ".pdf")
@@ -219,10 +192,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
 
     if double_zv:
         fig = plt.figure(figsize=(7,7))
-        if interactions:
-            fig.suptitle(r'2 Particles, $z v_z$-plane, with interaction', fontsize = fsize)
-        else:
-            fig.suptitle(r'2 Particles, $z v_z$-plane, without interaction', fontsize = fsize)
+        fig.suptitle(r'2 Particles, $z v_z$-plane', fontsize = fsize)
         ax = fig.add_subplot(1,1,1)
 
         # plot in micro-seconds/meters
@@ -234,65 +204,32 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         ax.set_xlabel(r'z $[\mu m]$') 
         ax.set_ylabel(r'$v_z$ $[\frac{m}{s}]$')
         ax.legend()
+
+        ax.legend()
         ax.grid()
         plt.tight_layout()
         plt.savefig("plots/two_zv" + add + ".pdf")
 
 
     if double_xyz:
+        from mpl_toolkits.mplot3d import Axes3D
+
         fig = plt.figure(figsize=(7, 7))
-        if interactions:
-            fig.suptitle(r'2 Particles, $xyz$-space, with interaction', fontsize = fsize)
-        else:
-            fig.suptitle(r'2 Particles, $xyz$-space, without interaction', fontsize = fsize)
+        fig.suptitle(r'2 Particles, $xyz$-space', fontsize=fsize)
         ax = fig.add_subplot(111, projection='3d')
 
         for n in range(n_particles):            
             ax.plot(r[n,:,0], r[n,:,1], r[n,:,2], label=f'P{n+1}') 
-            ax.scatter(r[n,0,0], r[n,0,1], r[n,0,2], 'r')
-            ax.scatter(r[n,-1,0], r[n,-1,1], r[n,-1,2], 'g')
 
     
         ax.set_xlabel(r'x $[\mu m]$')
         ax.set_ylabel(r'y $[\mu m]$')
         ax.set_zlabel(r'z $[\mu m]$')
-        ax.set_xlim(-d,d)
-        ax.set_ylim(-d,d)
-        ax.set_zlim(-d,d)
 
         ax.legend()
         ax.grid()
         plt.tight_layout()
         plt.savefig("plots/two_xyz" + add + ".pdf")
-
-
-def loss_particles(interactions):
-    # ------------------------------- Read file -----------------------------
-    if interactions:  # with interactions
-        filename = "two_particles_int_RK4.txt"
-        add = "_int" 
-    else: # without interactions
-        filename = "two_particles_no_int_RK4.txt"
-        add = "_no_int"
-    # add to .pdf-name to separate interactinon with non-interaction  
-
-    t, r, v, n_particles = read_file(filename)
-
-    n_particles = len(r[:,0,0])
-    particles = np.zeros(n_particles)   # 0 = inside
-
-    for n in range(n_particles):
-        if np.linalg.norm(r[n,:,:]) > d:
-            particles[i] = 1            # 1 = outside
-    
-    print(particles)
-
-        
-
-
-    
-    
-            
 
 
 
@@ -303,23 +240,23 @@ if __name__ == "__main__":
     T_unit = 9.64852558e1  # μm / (μs * e)
     V_unit = 9.64852558e7  # μm^2 / (μs^2 * e)
     d = 500.0  # μm
-    e = 1 # electron charge = 1.6e-19 C
-    m_p = 1 # Proton mass = 1.6726219e-27 kg
+    e = 1.0
+    m_p = 1.0
+    tot_time = 500
 
     B0 = 1.00  # Tesla
     V0 = 25.0e-3  # Volt
     B0_converted = B0 * T_unit  # μm / (μs * e)
-    V0_converted = V0 * V_unit  # μm^2 / (μs^2 * e)
-
-    B0 = B0_converted
-    V0 = V0_converted
-
+    V0_converted = V0 * V_unit # Volt
+  # μm^2 / (μs^2 * e)
+    #B0 = B0_converted
+    #V0 = V0_converted
     V0_d2 = V0_converted / d**2 # Ratio of V0/d^2
 
     q = e
-    m = m_p
+    m = 40.078
     wz = np.sqrt(2 * q / m * V0_d2)
-    w0 = q * B0 / m
+    w0 = q * B0_converted / m
 
     # -------------------- Constants for analytical solution----------------
     
@@ -340,32 +277,22 @@ if __name__ == "__main__":
     
 
     # --------------------------------------- PLOTS BOOL -----------------------------------
-    want_single = False
+    single     = True
+    double_xy  = True 
+    double_xv  = True
+    double_zv  = True
+    double_xyz = True
 
-    double_xy   = True
-    double_xv   = True
-    double_zv   = True
-    double_xyz  = True
-
-    interactions = True  # With interaction = True,   Without interactions = False
-
-    want_loss_particles = True
+    interactions = False  # With interaction = True,   Without interactions = False
 
 
 
     # -------------------------------------   1 Particle --------------------------------
-    if want_single: 
+    if single: 
         single_particle(r0,v0,w0,wz,phi_m,phi_p)
 
 
 
     # -------------------------------------   2 Particles ----------------------------------
 
-    two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz)
-
-    
-
-    # -------------------------------- Loss of trapped particles ---------------------------
-
-    if want_loss_particles:
-        loss_particles(interactions)
+    two_particles(interactions, double_xy, double_xv, double_zv, double_xyz)

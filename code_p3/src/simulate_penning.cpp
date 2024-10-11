@@ -46,15 +46,16 @@ void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int 
 
 void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap) {
 
-    double timesteps = 50+1;
-    double dt = 0.000001;
+    double time = 500;
+    double dt = 0.01;
+    int timesteps = time/dt;
 
     // Simulate the movement of a single particle in Penning trap for a total time of 50µs.
     // Make a plot of the motion in the direction as a function of time.
     simulate(particles, trap, dt, timesteps, "code_p3/data/one_particle_int_RK4.txt", true);
 
     // Simulate two particles in your Penning trap and make a plot of their motion in the xy-plane with and without particle interactions.
-    particles.push_back(Particle(1.0, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
+    particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
     simulate(particles, trap, dt, timesteps, "code_p3/data/two_particles_int_RK4.txt", true);
 
     // and without particle interactions
@@ -80,7 +81,7 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
 int main() {
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
-    particles.push_back(Particle(1.0, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
+    particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
 
     // task 8
     simulate_traps_constant_E(particles, trap);

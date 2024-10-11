@@ -39,20 +39,24 @@ int main(){
     trap.add_particle(electron1);
     //trap.add_particle(electron2);
 
-    std::string filename = "data/testing_for_benjamin_one_particle.txt";
-    std::ofstream ofile(filename, std::ios::trunc);
-    ofile.close(); 
+    std::cout << "Bigger: " << B0*B0*1/40 << std::endl;
+    std::cout << "Smaller: " << 4*V0/(d*d) << std::endl;
 
-    trap.save_metadata(num_particles, timesteps+1, filename);
 
-    for (int i = 0; i <= timesteps; i++) {
-        trap.save_to_file(filename, i*dt); 
-        trap.evolve_RK4(dt); 
-    }
+    //std::string filename = "data/testing_for_benjamin_one_particle.txt";
+    //std::ofstream ofile(filename, std::ios::trunc);
+    //ofile.close(); 
+
+    //trap.save_metadata(num_particles, timesteps+1, filename);
+
+    //for (int i = 0; i <= timesteps; i++) {
+        //trap.save_to_file(filename, i*dt); 
+        //trap.evolve_RK4(dt); 
+    //}
 
     return 0;
 }
 
 
-//  g++ src/simulate_penning.cpp src/utils.cpp src/Particle.cpp  src/PenningTrap.cpp -I include -o out -std=c++14 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
+//  g++ code_p3/src/simulate_penning.cpp code_p3/src/utils.cpp code_p3/src/Particle.cpp  code_p3/src/PenningTrap.cpp -I code_p3/include -o out -std=c++14 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
 
