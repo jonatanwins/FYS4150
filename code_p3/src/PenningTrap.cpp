@@ -3,6 +3,7 @@
 #include "Particle.hpp"
 #include "constants.hpp"
 #include <vector>
+#include <iostream>
 
 PenningTrap::PenningTrap(double B0_in, double V0_in, double d_in, bool interaction_in)
     : B0(B0_in), V0(V0_in), d(d_in), particles(), interaction(interaction_in) {
@@ -14,7 +15,7 @@ void PenningTrap::set_time_dependent_params(double f_in, double w_v_in) {
 }
 
 void PenningTrap::update_time_dependent_V0(double t) {
-    double V0_dep = V0*(1 + f*std::cos(w_v * t));
+    double V0_dep = V0_converted*(1 + f*std::cos(w_v * t));
     V0 = V0_dep;
 }
 
