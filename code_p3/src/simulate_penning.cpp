@@ -5,13 +5,13 @@
 #include <filesystem>
 #include <armadillo>
 
-//void create_directories() {
-    //std::vector<std::string> dirs = {"data", "plots"};
+void create_directories() {
+    std::vector<std::string> dirs = {"data", "plots"};
     
-    //for (const std::string& dir : dirs) {
-        //std::filesystem::create_directories(dir);
-    //}
-//}
+    for (const std::string& dir : dirs) {
+        std::filesystem::create_directories(dir);
+    }
+}
 
 void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int timesteps, 
         std::string filename, bool interactions = true, std::string method = "RK4", bool time_dependent_E = false) {
@@ -98,16 +98,8 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
     simulate(particles, trap, dt, timesteps, filename.str(), false, "RK4", true);
 }
 
-
-int main() {
-    //create_directories();
-
-    PenningTrap trap(B0_converted, V0_converted, d_const);
-    std::vector<Particle> particles;
-    particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
-    particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
-
-    for (int i = 0; i < 8; i++) {
+void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles) {
+    for (int i = 0; i < number_of_particles; i++) {
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
 
@@ -117,5 +109,28 @@ int main() {
             simulate_traps_time_dependent_E(particles, trap);
         }
     }
+}
+
+
+int main() {
+    create_directories();
+
+    PenningTrap trap(B0_converted, V0_converted, d_const);
+    std::vector<Particle> particles;
+    particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
+    particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
+
+    simulate_arbitrary_particles(particles, trap, 8);
+
+    // for (int i = 0; i < 8; i++) {
+    //     particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
+    // }
+
+    // for (double f = 0.1; f <= 0.7; f += 0.3) {
+    //     for (double w_v = 2.18; w_v <= 2.32; w_v += 0.02) {
+    //         trap.set_time_dependent_params(f, w_v);
+    //         simulate_traps_time_dependent_E(particles, trap);
+    //     }
+    // }
 }
     
