@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-#from pathlib import Path
-
+import seaborn as sns
 
 fsize = 18
 fsize2 = 15
@@ -147,8 +146,8 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
         plt.show()
 
         # ------------------------------ Error convergence rate ---------------------------
-        print(h_list)
-        print(delta_list)
+        #print(h_list)
+        #print(delta_list)
         for i in range(len(solver_list)):
             for j in range(1, len(n_list)):
                 r_err_con += 1/3 * np.log10( delta_list[i,j] / delta_list[i,j-1] ) / np.log10( h_list[i,j] / h_list[i,j-1] )
@@ -246,6 +245,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
             fig.suptitle(r'2 Particles, $xyz$-space, with interaction', fontsize = fsize)
         else:
             fig.suptitle(r'2 Particles, $xyz$-space, without interaction', fontsize = fsize)
+
         ax = fig.add_subplot(111, projection='3d')
 
         for n in range(n_particles):            
@@ -267,31 +267,99 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         plt.savefig("plots/two_xyz" + add + ".pdf")
 
 
-def loss_particles(interactions):
+def loss_particles(interactions, solver):
     # ------------------------------- Read file -----------------------------
+    f_list = np.linspace(0.1,0.7, 3)
+    w_list = np.linspace(2.18, 2.30, 7)
+    #print(f_list, w_list)
+
+    file_list = [i for i in range(len(f_list) * len(w_list))]
+    #file_list = np.zeros(len(f_list) * len(w_list))
+
     if interactions:  # with interactions
-        filename = "two_particles_int_RK4.txt"
-        add = "_int" 
+        add = "int_" 
+        for i in range(len(f_list)):
+            for j in range(len(w_list)):
+                file_list[i*len(w_list) + j] = add + 'f_' + str(f_list[i]) + '_w_v_' + str(w_list[j]) + '_.txt'
+
     else: # without interactions
-        filename = "two_particles_no_int_RK4.txt"
+        add = "no_int_" 
+        for i in range(len(f_list)):
+            for j in range(len(w_list)):
+                file_list[i*len(w_list) + j] = add + 'f_' + str(f_list[i]) + '_w_v_' + str(w_list[j]) + '_.txt'
+
+
+
+
+    """file_list = ['two_particles', 'two_particles']
+    # edit filenames  +  variables:  int/no_int  &   RK4/FE
+    if interactions:  # with interactions
+        #filename = "two_particles_int_RK4.txt"
+        add = "_int" 
+        for i in range(len(file_list)):
+            
+            file_list[i] = file_list[i] + add + solver + '.txt'
+
+    else: # without interactions
+        #filename = "two_particles_no_int_RK4.txt"
         add = "_no_int"
-    # add to .pdf-name to separate interactinon with non-interaction  
-
-    t, r, v, n_particles = read_file(filename)
-
-    n_particles = len(r[:,0,0])
-    particles = np.zeros(n_particles)   # 0 = inside
-
-    for n in range(n_particles):
-        if np.linalg.norm(r[n,:,:]) > d:
-            particles[n] = 1            # 1 = outside
+        for i in range(len(file_list)):
+            file_list[i] = file_list[i] + add + solver + '.txt'"""
     
-    print(particles)
+
+
+
+
+     
+    # ----- Sum up trapped particles --------
+    trapped_list = np.zeros(len(file_list))
+    #trapped_list = np.zeros(len(f_list), len(w_list))
+    for i,filename in enumerate(file_list):
+        t, r, v, n_particles = read_file(filename)
+
+        n_particles = len(r[:,0,0])
+        particles = np.zeros(n_particles)   # 0 = outside
+
+        for n in range(n_particles):
+            if np.linalg.norm(r[n,:,:]) < d: 
+                particles[n] = 1            # 1 = trapped inside
+
+        trapped_list[i] = sum(particles)
+    
+
+
+    # ------ Plot histogram ----------
+    fig = plt.figure(figsize=(7, 7))
+    if interactions:
+        fig.suptitle(f'Fraction of {n_particles} particles trapped after 500µs \nwith interaction', fontsize = fsize)
+    else:
+        fig.suptitle(f'Fraction of {n_particles} particles trapped after 500µs \nwithout interaction', fontsize = fsize)
+        
+    ax = fig.add_subplot(111)
+
+    # Create heatmap
+    xedges = f_list #[0.1, 0.4,] # modify these
+    yedges = w_list #[0.2]      # modify these
+    trapped_list = trapped_list.reshape(len(w_list), len(f_list)) # reshape for heatmap
+    #trapped_list = trapped_list.reshape(1,-1)
+
+    print('File list:  ', file_list)
+    print('Trapped list:  ', trapped_list)
+    print('Trapped list shape: ', trapped_list.shape)
+    sns.heatmap(trapped_list, annot=True, cmap="Blues", xticklabels=xedges, yticklabels=yedges)
+
+    ax.set_xlabel(r'Frequency $\omega_v$ [MHz]')
+    ax.set_ylabel(r'Amplitude f $[]$')
+
+
+    ax.grid()
+    plt.tight_layout()
+    plt.savefig("plots/trapped_" + add + solver + ".pdf")
+
+
 
         
 
-
-    
     
             
 
@@ -342,14 +410,14 @@ if __name__ == "__main__":
     
 
     # --------------------------------------- PLOTS BOOL -----------------------------------
-    want_single = True
+    want_single = False
 
-    double_xy   = True
-    double_xv   = True
-    double_zv   = True
-    double_xyz  = True
+    double_xy   = False
+    double_xv   = False
+    double_zv   = False
+    double_xyz  = False
 
-    interactions = True  # With interaction = True,   Without interactions = False
+    interactions = False  # With interaction = True,   Without interactions = False
 
     want_loss_particles = True
 
@@ -368,6 +436,10 @@ if __name__ == "__main__":
     
 
     # -------------------------------- Loss of trapped particles ---------------------------
-
+    solver = 'RK4'  # chose '_RK4' or '_FE'
     if want_loss_particles:
-        loss_particles(interactions)
+        loss_particles(interactions, solver)
+
+
+
+    # Version 16.10-2024
