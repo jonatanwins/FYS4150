@@ -102,20 +102,23 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
 }
 
 void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles, bool interactions = false,
-                                    std::vector<double> f_interval = {0.1, 0.4, 0.7}, std::vector<double> w_v_interval = {2.18, 2.20, 2.22, 2.24, 2.26, 2.28, 2.30, 2.32}) {
+                                    double f_start = 0.1, double f_stop = 0.7, double f_step = 0.3, 
+                                    double w_v_start = 2.18, double w_v_stop = 2.32, double w_v_step = 0.2
+                                    ) {
     arma::arma_rng::set_seed(4150); // set seed for reproducability, FYS4150
     
     for (int i = 0; i < number_of_particles; i++) {
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
 
-    for (const int& f : f_interval) {
-        for (const int& w_v : w_v_interval) {
+    for (int f = f_start; f <= f_stop; f += f_step) {
+        for (int w_v = f_start; w_v <= w_v_stop; w_v += w_v_step) { 
             trap.set_time_dependent_params(f, w_v);
             simulate_traps_time_dependent_E(particles, trap, interactions);
         }
     }
 }
+                                    
 
 
 int main() {
@@ -125,11 +128,7 @@ int main() {
     std::vector<Particle> particles;
 
     // choose simulation
-    std::vector<double> f_interval = {0.1, 0.4, 0.7};
-    std::vector<double> w_v_interval(8);
-    std::generate(w_v_interval.begin(), w_v_interval.end(), [n = 2.18]() mutable { return n += 0.02; }); 
-
-    simulate_arbitrary_particles(particles, trap, 1, false, f_interval, w_v_interval);
+    simulate_arbitrary_particles(particles, trap, 1, false, 0.1, 0.7, 0.3,  2.18, 2.32, 0.2);
 
 }
     
