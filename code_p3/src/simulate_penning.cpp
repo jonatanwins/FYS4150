@@ -107,7 +107,7 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
                                     ) {
     arma::arma_rng::set_seed(4150); // set seed for reproducability, FYS4150
     
-    for (int i = 0; i < number_of_particles; i++) {
+    for (int i = 0; i <= number_of_particles; i++) {
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
 
@@ -128,7 +128,7 @@ int main() {
     std::vector<Particle> particles;
 
     // choose simulation
-    simulate_arbitrary_particles(particles, trap, 1, false, 0.1, 0.7, 0.3,  2.18, 2.32, 0.2);
-
+    simulate_arbitrary_particles(particles, trap, 2, false, 0.1, 0.7, 0.3, 2.18, 2.32, 0.2);
+    
 }
     
