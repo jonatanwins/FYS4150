@@ -5,13 +5,13 @@
 #include <filesystem>
 #include <armadillo>
 
-void create_directories() {
-    std::vector<std::string> dirs = {"data", "plots"};
+//void create_directories() {
+    //std::vector<std::string> dirs = {"data", "plots"};
     
-    for (const std::string& dir : dirs) {
-        std::filesystem::create_directories(dir);
-    }
-}
+    //for (const std::string& dir : dirs) {
+        //std::filesystem::create_directories(dir);
+    //}
+//}
 
 void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int timesteps, 
         std::string filename, bool interactions = true, std::string method = "RK4", bool time_dependent_E = false) {
@@ -96,7 +96,14 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
 
     int size_particles = particles.size();
     std::ostringstream filename;
-    filename << "data/no_int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_.txt";
+
+    if (interactions) {
+        filename << "data/int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_.txt";
+    }
+    else {
+        filename << "data/no_int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_.txt";
+    }
+    
 
     simulate(particles, trap, dt, timesteps, filename.str(), interactions, "RK4", true);
 }
@@ -107,12 +114,12 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
                                     ) {
     arma::arma_rng::set_seed(4150); // set seed for reproducability, FYS4150
     
-    for (int i = 0; i <= number_of_particles; i++) {
+    for (int i = 0; i < number_of_particles; i++) {
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
 
-    for (int f = f_start; f <= f_stop; f += f_step) {
-        for (int w_v = f_start; w_v <= w_v_stop; w_v += w_v_step) { 
+    for (double f = f_start; f <= f_stop; f += f_step) {
+        for (double w_v = w_v_start; w_v <= w_v_stop; w_v += w_v_step) { 
             trap.set_time_dependent_params(f, w_v);
             simulate_traps_time_dependent_E(particles, trap, interactions);
         }
@@ -123,12 +130,13 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
 
 int main() {
     // intialization
-    create_directories();
+    //create_directories();
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
 
     // choose simulation
-    simulate_arbitrary_particles(particles, trap, 2, false, 0.1, 0.7, 0.3, 2.18, 2.32, 0.2);
+    simulate_arbitrary_particles(particles, trap, 2, true, 0.7, 0.71, 0.3, 0.7, 0.8, 0.2);
     
 }
+    
     
