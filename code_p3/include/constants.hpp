@@ -16,3 +16,5 @@ constexpr double V0 = 25.0e-3; // 25.0 mV = 25.0e-3 V
 constexpr double V0_converted = V0 * V_unit; // μm^2 / (μs^2 * e)
 
 constexpr double d_const = 500.0; // μm
+
+constexpr double m = 40.078; // mass of calcium in atomic units
