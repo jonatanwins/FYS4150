@@ -73,13 +73,13 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
     t_anl, z_anl = single_z_anl(wz, r0, t_max, N_points)
 
 
-    #filename = "one_particle_int_RK4.txt"
-    filename = "one_particle_int_RK4_time_dep.txt"
+    filename = "one_particle_int_RK4.txt"
+    #filename = "one_particle_int_RK4_time_dep.txt"
     t, r, v, n = read_file(filename)
 
     # ------------------------------- Plotting motion z -------------------------------
     fig = plt.figure(figsize=(6,6))
-    fig.suptitle('Single particle motin in time, z-direction in time', fontsize = fsize)
+    fig.suptitle('Single particle motion in time, z-direction in time', fontsize = fsize)
     ax = fig.add_subplot(1,1,1)
 
     # plot in micro-seconds/meters
@@ -158,17 +158,18 @@ def single_particle(r0,v0,w0,wz,phi_m,phi_p):
 
 
 def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
-    # ------------------------------- Read file -----------------------------
-    if interactions:  # with interactions
-        filename = "two_particles_int_RK4.txt"
-        add = "_int" 
-    else: # without interactions
-        filename = "two_particles_no_int_RK4.txt"
-        add = "_no_int"
-    # add to .pdf-name to separate interactinon with non-interaction  
-    
 
-    t, r, v, n_particles = read_file(filename)
+    if double_xy or double_xv or double_zv or double_xyz:
+        # ------------------------------- Read file -----------------------------
+        if interactions:  # with interactions
+            filename = "two_particles_int_RK4.txt"
+            add = "_int" 
+        else: # without interactions
+            filename = "two_particles_no_int_RK4.txt"
+            add = "_no_int"
+        # add to .pdf-name to separate interactinon with non-interaction  
+    
+        t, r, v, n_particles = read_file(filename)
 
 
 
@@ -321,7 +322,7 @@ def loss_particles(interactions, solver):
         particles = np.zeros(n_particles)   # 0 = outside
 
         for n in range(n_particles):
-            if np.linalg.norm(r[n,:,:]) < d: 
+            if np.linalg.norm(r[n,-1,:]) < d: 
                 particles[n] = 1            # 1 = trapped inside
 
         trapped_list[i] = sum(particles)
@@ -338,8 +339,8 @@ def loss_particles(interactions, solver):
     ax = fig.add_subplot(111)
 
     # Create heatmap
-    xedges = f_list #[0.1, 0.4,] # modify these
-    yedges = w_list #[0.2]      # modify these
+    xedges = w_list #[0.1, 0.4,] # modify these
+    yedges = f_list  #[0.2]      # modify these
     trapped_list = trapped_list.reshape(len(w_list), len(f_list)) # reshape for heatmap
     #trapped_list = trapped_list.reshape(1,-1)
 
@@ -419,7 +420,7 @@ if __name__ == "__main__":
 
     interactions = False  # With interaction = True,   Without interactions = False
 
-    want_loss_particles = True
+    want_loss_particles = False
 
 
 
@@ -442,4 +443,4 @@ if __name__ == "__main__":
 
 
 
-    # Version 16.10-2024
+    # Version 17.10-2024
