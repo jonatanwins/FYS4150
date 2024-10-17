@@ -99,6 +99,8 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
 }
 
 void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles) {
+    arma::arma_rng::set_seed(42); // set seed for reproducability
+    
     for (int i = 0; i < number_of_particles; i++) {
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
