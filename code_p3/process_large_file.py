@@ -39,6 +39,6 @@ def process_folder(source_folder, target_folder, num_lines=100):
 
 source_folder = "data"
 num_lines = 100
-target_folder = f"w_v_from_2.0_to_2.4_last_{num_lines}_lines"
+target_folder = f"last_{num_lines}_lines_w_v_from_2.15_to_2.25_step_0.01_no_int"
 
 process_folder(source_folder, target_folder, num_lines)

@@ -106,7 +106,7 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
     
 
     simulate(particles, trap, dt, timesteps, filename.str(), interactions, "RK4", true);
-    std::cout << "Completed simulation " << filename << std::endl;
+    std::cout << "Completed simulation " << filename.str() << std::endl;
 }
 
 void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles, bool interactions = false,
@@ -136,9 +136,9 @@ int main() {
     std::vector<Particle> particles;
 
     // choose simulation
-    simulate_arbitrary_particles(particles, trap, 100, false, 
+    simulate_arbitrary_particles(particles, trap, 100, true, 
     0.4, 0.4, 0.01, 
-    2.4, 2.4, 0.1);
+    2.15, 2.25, 0.01);
     
 }
     
