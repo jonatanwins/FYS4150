@@ -286,6 +286,11 @@ def loss_particles(interactions, solver):
     w_list = np.linspace(2.18, 2.30, 7)
     # print(f_list, w_list)
 
+    #f_list = np.linspace(0.1, 0.7, 3)
+    #w_list = np.linspace(0.2, 2.48, 115)
+    #print(f_list, w_list)
+
+
     file_list = [i for i in range(len(f_list) * len(w_list))]
     # file_list = np.zeros(len(f_list) * len(w_list))
 
@@ -305,20 +310,6 @@ def loss_particles(interactions, solver):
                     add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
                 )
 
-    """file_list = ['two_particles', 'two_particles']
-    # edit filenames  +  variables:  int/no_int  &   RK4/FE
-    if interactions:  # with interactions
-        #filename = "two_particles_int_RK4.txt"
-        add = "_int" 
-        for i in range(len(file_list)):
-            
-            file_list[i] = file_list[i] + add + solver + '.txt'
-
-    else: # without interactions
-        #filename = "two_particles_no_int_RK4.txt"
-        add = "_no_int"
-        for i in range(len(file_list)):
-            file_list[i] = file_list[i] + add + solver + '.txt'"""
 
     # ----- Sum up trapped particles --------
     trapped_list = np.zeros(len(file_list))
@@ -330,45 +321,169 @@ def loss_particles(interactions, solver):
         particles = np.zeros(n_particles)  # 0 = outside
 
         for n in range(n_particles):
-            if np.linalg.norm(r[n, -1, :]) < d:
+            # check if |r(t_max)| <= d
+            if np.linalg.norm(r[n, -1, :]) <= d: 
                 particles[n] = 1  # 1 = trapped inside
 
         trapped_list[i] = sum(particles)
+
+
 
     # ------ Plot histogram ----------
     fig = plt.figure(figsize=(7, 7))
     if interactions:
         fig.suptitle(
-            f"Fraction of {n_particles} particles trapped after 500µs \nwith interaction",
+            f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwith interaction",
             fontsize=fsize,
         )
     else:
         fig.suptitle(
-            f"Fraction of {n_particles} particles trapped after 500µs \nwithout interaction",
+            f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwithout interaction",
             fontsize=fsize,
         )
 
     ax = fig.add_subplot(111)
 
     # Create heatmap
-    xedges = w_list  # [0.1, 0.4,] # modify these
-    yedges = f_list  # [0.2]      # modify these
+    yedges = f_list  # [0.1, 0.4,] # modify these
+    xedges = w_list  # [0.2]      # modify these
     trapped_list = trapped_list.reshape(len(w_list), len(f_list))  # reshape for heatmap
     # trapped_list = trapped_list.reshape(1,-1)
 
     print("File list:  ", file_list)
     print("Trapped list:  ", trapped_list)
     print("Trapped list shape: ", trapped_list.shape)
-    sns.heatmap(
-        trapped_list, annot=True, cmap="Blues", xticklabels=xedges, yticklabels=yedges
-    )
+    #sns.heatmap(trapped_list, annot=True, cmap="Blues", xticklabels=xedges, yticklabels=yedges)
+    sns.heatmap(trapped_list.T, annot=False, cmap="Blues", xticklabels=xedges, yticklabels=yedges, linewidths=0)
+
 
     ax.set_xlabel(r"Frequency $\omega_v$ [MHz]")
     ax.set_ylabel(r"Amplitude f $[]$")
-
-    ax.grid()
+    ax.grid(False)
     plt.tight_layout()
     plt.savefig("plots/trapped_" + add + solver + ".pdf")
+
+    
+    # ----------------- Plot time evolution -------------------
+    n_particles = 10 # is defined above and WILL DELITE WHEN FINISHED
+
+    fig = plt.figure(figsize=(6, 6))
+    fig.suptitle(f"Time evolution of {n_particles} trapped particles", fontsize=fsize)
+    ax = fig.add_subplot(1, 1, 1)
+
+
+    # ---- Selecting chousen values for time evolution ---
+    # [[i1,j1] , [i2,j2]]
+    #ij_list = [[1,0],[1,1],[1,2]]
+    ij_list = [[1,2]]
+
+    for i, j in ij_list:
+        filename = add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
+        t, r, v, n_particles = read_file(filename)
+
+        trapped = np.zeros(len(t))
+        n_particles = len(r[:, 0, 0])
+
+        for i_t in range(len(t)):
+            particles = np.zeros(n_particles)  # 0 = outside
+
+            for n in range(n_particles):
+                    # check if |r(t_max)| <= d
+                    if np.linalg.norm(r[n, i_t, :]) <= d: 
+                        particles[n] = 1       # 1 = trapped inside
+
+            trapped[i_t] = sum(particles)
+
+
+        half = int(len(t)/5)
+        start = int(len(t)/7)
+        t = t[start:half]
+        trapped = trapped[start:half]
+        ax.plot(t, trapped, label=f'f = {f_list[i]}, w_v = {w_list[j]}')
+
+        
+    ax.set_xlabel(r"t $[\mu s]$", fontsize=fsize2)
+    ax.set_ylabel(r"Trapped particles $[]$", fontsize=fsize2)
+    plt.tight_layout()
+    plt.legend()
+    plt.grid()
+    pdfname = 'plots/trapped_time_evolution' + add + solver + ".pdf"
+    plt.savefig(pdfname)
+
+
+    """
+    # ------------------------ Plot xyz motion plot ----------------------------------
+    fig = plt.figure(figsize=(7, 7))
+    if interactions:
+        fig.suptitle(r"10 Particles, $xyz$-space, with interaction", fontsize=fsize)
+    else:
+        fig.suptitle(r"10 Particles, $xyz$-space, without interaction", fontsize=fsize)
+
+    ax = fig.add_subplot(111, projection="3d")
+
+    for n in range(n_particles):
+        r_n = r[n,start:half,:]
+        ax.plot(r_n[:,0], r_n[:, 1], r_n[:, 2], label=f"P{n+1}")
+        #ax.scatter(r[n, 0, 0], r[n, 0, 1], r[n, 0, 2], "r")
+        #ax.scatter(r[n, -1, 0], r[n, -1, 1], r[n, -1, 2], "g")
+
+    # -------------------- Plot sphere -------------------
+    phi, theta = np.mgrid[0:2*np.pi:100j, 0:np.pi:50j]
+
+    x = d * np.sin(theta) * np.cos(phi)
+    y = d * np.sin(theta) * np.sin(phi)
+    z = d * np.cos(theta)
+    ax.plot_surface(x, y, z, rstride=5, cstride=5, color='r', alpha=0.4)
+    # ------------------------------------------------------
+
+    ax.set_xlabel(r"x $[\mu m]$")
+    ax.set_ylabel(r"y $[\mu m]$")
+    ax.set_zlabel(r"z $[\mu m]$")
+    ax.set_xlim(-d,d)
+    ax.set_ylim(-d,d)
+    ax.set_zlim(-d,d)
+
+    ax.legend()
+    ax.grid()
+    plt.tight_layout()
+    plt.show()
+    plt.savefig("plots/" + str(n_particles) + "_xyz" + add + ".pdf")
+
+    # --------------------------------------------- Plot xy plot ------------------------------------
+    fig = plt.figure(figsize=(7, 7))
+    if interactions:
+        fig.suptitle("10 Particles, xy-plane, with interaction", fontsize=fsize)
+    else:
+        fig.suptitle("10 Particles, xy-plane, without interaction", fontsize=fsize)
+    ax = fig.add_subplot(1, 1, 1)
+
+    for n in range(n_particles):
+        if n == 2 or n == 3:
+            r_n = r[n,start:half,:]
+            ax.plot(r_n[:,0], r_n[:, 1], label=f"P{n+1}")
+
+
+    # -------------------- Plot sphere -------------------
+    phi = np.linspace(0,2*np.pi,100)
+
+    x = d * np.cos(phi) 
+    y = d * np.sin(phi)
+    ax.plot(x, y, color='r', alpha=0.4)
+    # ------------------------------------------------------
+
+    ax.set_xlabel(r"x $[\mu m]$")
+    ax.set_ylabel(r"y $[\mu m]$")
+
+    margin = 60
+    ax.set_xlim(-d-margin,d+margin)
+    ax.set_ylim(-d-margin,d+margin)
+    ax.legend()
+    ax.grid()
+    # ax.axis('equal')
+    plt.tight_layout()
+    plt.savefig("plots/" + str(n_particles) + "_xy" + add + ".pdf")
+
+    """
 
 
 if __name__ == "__main__":
@@ -379,7 +494,7 @@ if __name__ == "__main__":
     V_unit = 9.64852558e7  # μm^2 / (μs^2 * e)
     d = 500.0  # μm
     e = 1  # electron charge = 1.6e-19 C
-    m_p = 1  # Proton mass = 1.6726219e-27 kg
+    m_p = 40.078  # Proton mass = 1.6726219e-27 kg
     tot_time = 500
 
     B0 = 1.00  # Tesla
@@ -423,7 +538,7 @@ if __name__ == "__main__":
 
     interactions = False  # With interaction = True,   Without interactions = False
 
-    want_loss_particles = False
+    want_loss_particles = True
 
     # -------------------------------------   1 Particle --------------------------------
     if want_single:
@@ -438,4 +553,4 @@ if __name__ == "__main__":
     if want_loss_particles:
         loss_particles(interactions, solver)
 
-    # Version 17.10-2024
+    # Version 18.10-2024
