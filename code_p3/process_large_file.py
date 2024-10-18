@@ -37,8 +37,8 @@ def process_folder(source_folder, target_folder, num_lines=100):
             print(f"Last {num_lines} lines saved to: {new_file_path}")
 
 
-source_folder = "code_p3/data"
+source_folder = "data"
 num_lines = 100
-target_folder = f"code_p3/data_last_{num_lines}_lines"
+target_folder = f"w_v_from_2.0_to_2.4_last_{num_lines}_lines"
 
 process_folder(source_folder, target_folder, num_lines)
