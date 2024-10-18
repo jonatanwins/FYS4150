@@ -10,11 +10,13 @@ def read_last_n_lines(file_path, num_lines=100):
 
 
 # adds suffix to new filename
-def save_lines_to_file(file_path, lines, num_lines):
-    base, ext = os.path.splitext(file_path)  # ext is .txt
-    new_file_path = (
-        f"{base}last_{num_lines}_lines{ext}"  # looks weird, but files always end with _
-    )
+def save_lines_to_file(file_path, lines, num_lines, target_folder):
+    base, ext = os.path.splitext(
+        os.path.basename(file_path)
+    )  # Get base file name and extension
+    new_file_path = os.path.join(
+        target_folder, f"{base}last_{num_lines}_lines{ext}"
+    )  # looks weird but all files end in _
 
     with open(new_file_path, "w") as new_file:
         new_file.write("\n".join(lines))
@@ -22,9 +24,25 @@ def save_lines_to_file(file_path, lines, num_lines):
     return new_file_path
 
 
-file_path = "code_p3/data/no_int_f_0_w_v_0_.txt"
-num_lines = 100
-lines = read_last_n_lines(file_path, num_lines)
+def process_folder(source_folder, target_folder, num_lines=100):
+    # Ensure the target folder exists
+    os.makedirs(target_folder, exist_ok=True)
 
-last_100_lines_file = save_lines_to_file(file_path, lines, num_lines)
-print(f"Last {num_lines} lines saved to: {last_100_lines_file}")
+    # Loop through all files in the source folder
+    for file_name in os.listdir(source_folder):
+        file_path = os.path.join(source_folder, file_name)
+
+        if os.path.isfile(file_path):  # Check if it's a file
+            lines = read_last_n_lines(file_path, num_lines)
+            new_file_path = save_lines_to_file(
+                file_path, lines, num_lines, target_folder
+            )
+            print(f"Last {num_lines} lines saved to: {new_file_path}")
+
+
+# Example usage
+source_folder = "code_p3/data"
+target_folder = "code_p3/data_last_lines"
+num_lines = 100
+
+process_folder(source_folder, target_folder, num_lines)
