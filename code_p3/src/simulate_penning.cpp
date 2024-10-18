@@ -135,7 +135,9 @@ int main() {
     std::vector<Particle> particles;
 
     // choose simulation
-    simulate_arbitrary_particles(particles, trap, 100, false, 0.1, 0.7, 0.3, 0.2, 2.5, 0.02);
+    simulate_arbitrary_particles(particles, trap, 100, true, 
+    0.39, 0.41, 0.01, 
+    2.239, 2.241, 0.001);
     
 }
     
