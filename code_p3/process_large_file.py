@@ -11,9 +11,7 @@ def read_last_n_lines(file_path, num_lines=100):
 
 # adds suffix to new filename
 def save_lines_to_file(file_path, lines, num_lines, target_folder):
-    base, ext = os.path.splitext(
-        os.path.basename(file_path)
-    )  # Get base file name and extension
+    base, ext = os.path.splitext(os.path.basename(file_path))  # ext is .txt
     new_file_path = os.path.join(
         target_folder, f"{base}last_{num_lines}_lines{ext}"
     )  # looks weird but all files end in _
@@ -25,14 +23,13 @@ def save_lines_to_file(file_path, lines, num_lines, target_folder):
 
 
 def process_folder(source_folder, target_folder, num_lines=100):
-    # Ensure the target folder exists
+    # make target folder unless it exists
     os.makedirs(target_folder, exist_ok=True)
 
-    # Loop through all files in the source folder
     for file_name in os.listdir(source_folder):
         file_path = os.path.join(source_folder, file_name)
 
-        if os.path.isfile(file_path):  # Check if it's a file
+        if os.path.isfile(file_path):
             lines = read_last_n_lines(file_path, num_lines)
             new_file_path = save_lines_to_file(
                 file_path, lines, num_lines, target_folder
@@ -40,9 +37,8 @@ def process_folder(source_folder, target_folder, num_lines=100):
             print(f"Last {num_lines} lines saved to: {new_file_path}")
 
 
-# Example usage
 source_folder = "code_p3/data"
-target_folder = "code_p3/data_last_lines"
 num_lines = 100
+target_folder = f"code_p3/data_last_{num_lines}_lines"
 
 process_folder(source_folder, target_folder, num_lines)
