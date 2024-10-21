@@ -145,47 +145,42 @@ void PenningTrap::evolve_RK4(double dt){
     // Copy the particles
     std::vector<Particle> particles_copy = particles;
 
-    // k1
+     // k1
     for (int j = 0; j < num_particles; j++){
-        k_r_1[j] = dt * particles_copy[j].v;  // particles_copy[j].v is arma::Col<double>
-        k_v_1[j] = dt * PenningTrap::total_force(j) / particles_copy[j].m;  // total_force returns arma::Col<double>
+        k_r_1[j] = dt * particles_copy[j].v;
+        k_v_1[j] = dt * PenningTrap::total_force(j) / particles_copy[j].m;
     }
 
-    // Update after k1
+    // k2 (don't update particles directly, use a temporary state)
     for (int j = 0; j < num_particles; j++) {
-        particles[j].r += 0.5 * k_r_1[j];  // r is arma::Col<double>
-        particles[j].v += 0.5 * k_v_1[j];  // v is arma::Col<double>
+        particles[j].r = particles_copy[j].r + 0.5 * k_r_1[j];
+        particles[j].v = particles_copy[j].v + 0.5 * k_v_1[j];
     }
-
-    // k2
-    for (int j = 0; j < num_particles; j++){
+    for (int j = 0; j < num_particles; j++) {
         k_r_2[j] = dt * particles[j].v;
         k_v_2[j] = dt * PenningTrap::total_force(j) / particles[j].m;
     }
 
-    // Update after k2
-    for (int j = 0; j < num_particles; j++) {
-        particles[j].r += 0.5 * k_r_2[j];
-        particles[j].v += 0.5 * k_v_2[j];
-    }
-
     // k3
-    for (int j = 0; j < num_particles; j++){
+    for (int j = 0; j < num_particles; j++) {
+        particles[j].r = particles_copy[j].r + 0.5 * k_r_2[j];
+        particles[j].v = particles_copy[j].v + 0.5 * k_v_2[j];
+    }
+    for (int j = 0; j < num_particles; j++) {
         k_r_3[j] = dt * particles[j].v;
         k_v_3[j] = dt * PenningTrap::total_force(j) / particles[j].m;
     }
 
-    // Update after k3
-    for (int j = 0; j < num_particles; j++) {
-        particles[j].r += k_r_3[j];
-        particles[j].v += k_v_3[j];
-    }
-
     // k4
-    for (int j = 0; j < num_particles; j++){
+    for (int j = 0; j < num_particles; j++) {
+        particles[j].r = particles_copy[j].r + k_r_3[j];
+        particles[j].v = particles_copy[j].v + k_v_3[j];
+    }
+    for (int j = 0; j < num_particles; j++) {
         k_r_4[j] = dt * particles[j].v;
         k_v_4[j] = dt * PenningTrap::total_force(j) / particles[j].m;
     }
+
 
     // Final update
     for (int j = 0; j < num_particles; j++){
@@ -198,12 +193,23 @@ void PenningTrap::evolve_RK4(double dt){
 // Evolve the system one time step (dt) using Forward Euler
 void PenningTrap::evolve_forward_Euler(double dt){
 
-    for (int j = 0; j < particles.size(); j++){
-        particles.at(j).r = particles.at(j).r + dt * particles.at(j).v;
-        particles.at(j).v = particles.at(j).v + dt * PenningTrap::total_force(j)/particles.at(j).m;
-    } 
+    int num_particles = particles.size();
+    std::vector<arma::vec> positions(num_particles);
+    std::vector<arma::vec> velocities(num_particles);
 
-}  
+    for (int j = 0; j < num_particles; j++){
+
+        positions[j] = particles[j].r + dt * particles[j].v;
+        velocities[j] = particles[j].v + dt * total_force(j) / particles[j].m;
+    }
+
+    for (int j = 0; j < num_particles; j++){
+        particles[j].r = positions[j];
+        particles[j].v = velocities[j];
+    }
+}
+ 
+
 
 void PenningTrap::save_metadata(int num_particles, int num_timesteps, std::string filename) {
     std::ofstream ofile(filename, std::ios::app);

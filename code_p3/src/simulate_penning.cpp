@@ -5,13 +5,13 @@
 #include <filesystem>
 #include <armadillo>
 
-void create_directories() {
-    std::vector<std::string> dirs = {"data", "plots"};
+//void create_directories() {
+    //std::vector<std::string> dirs = {"data", "plots"};
     
-    for (const std::string& dir : dirs) {
-        std::filesystem::create_directories(dir);
-    }
-}
+    //for (const std::string& dir : dirs) {
+        //std::filesystem::create_directories(dir);
+    //}
+//}
 
 void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int timesteps, 
         std::string filename, bool interactions = true, std::string method = "RK4", bool time_dependent_E = false) {
@@ -42,7 +42,7 @@ void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int 
     
     else if(method == "FE") {
         for (int i = 0; i < timesteps; i++) {
-        trap.save_to_file(filename, i*dt);
+        //trap.save_to_file(filename, i*dt);
         trap.evolve_forward_Euler(dt);
         }
         trap.save_to_file(filename, timesteps*dt);
@@ -56,22 +56,21 @@ void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int 
 void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap) {
 
     particles.push_back(Particle(40.078, 1.0, {20.0, 0.0, 20.0}, {0.0, 25.0, 0.0})); // adding 1. proton
-    particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
 
-    double time = 500;
+    double time = 50;
     double dt = 0.01;
     int timesteps = time/dt;
 
     // Simulate the movement of a single particle in Penning trap for a total time of 50µs.
     // Make a plot of the motion in the direction as a function of time.
-    simulate(particles, trap, dt, timesteps, "data/one_particle_int_RK4.txt", true);
+    simulate(particles, trap, dt, timesteps, "data/one_particle_int_RK4.txt", true, "RK4", false);
 
     // Simulate two particles in your Penning trap and make a plot of their motion in the xy-plane with and without particle interactions.
     particles.push_back(Particle(40.078, 1.0, {25.0, 25.0, 0.0}, {0.0, 40.0, 5.0})); // adding 2. proton
-    simulate(particles, trap, dt, timesteps, "data/two_particles_int_RK4.txt", true);
+    simulate(particles, trap, dt, timesteps, "data/two_particles_int_RK4.txt",true,"RK4", false);
 
     // and without particle interactions
-    simulate(particles, trap, dt, timesteps, "data/two_particles_no_int_RK4.txt", false);
+    simulate(particles, trap, dt, timesteps, "data/two_particles_no_int_RK4.txt", false, "RK4", false);
 
     //  1 particle and simulation time 50µs. Run the simulation four times, using 4000, 8000, 16000, 32000 timesteps
     // Do the same using the forward Euler method.
@@ -79,12 +78,12 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
     for (const int& n : {4000, 8000, 16000, 32000}) {
         std::ostringstream filename;
         filename << "data/one_particle_no_int_n=" << n << "_RK4.txt";
-        simulate(particles, trap, timesteps/n, n, filename.str(), true, "RK4");
+        simulate(particles, trap, time/n, n, filename.str(), false, "RK4", false);
         
         filename.str("");
         
         filename << "data/one_particle_no_int_n=" << n << "_FE.txt";
-        simulate(particles, trap, timesteps/n, n, filename.str(), true, "FE");
+        simulate(particles, trap, time/n, n, filename.str(), false, "FE", false);
     
     }
 }
@@ -121,6 +120,7 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
 
     for (double f = f_start; f <= f_stop; f += f_step) {
         for (double w_v = w_v_start; w_v <= w_v_stop; w_v += w_v_step) { 
+            std::cout << "f: " << f << " w_v: " << w_v << std::endl;
             trap.set_time_dependent_params(f, w_v);
             simulate_traps_time_dependent_E(particles, trap, interactions);
         }
@@ -131,14 +131,13 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
 
 int main() {
     // intialization
-    create_directories();
+    //create_directories();
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
 
     // choose simulation
-    simulate_arbitrary_particles(particles, trap, 100, true, 
-    0.4, 0.4, 0.01, 
-    2.15, 2.25, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, false, 0.1, 0.7, 0.3, 0.2, 2.52, 0.02);
+    simulate_traps_constant_E(particles, trap);
     
 }
     
