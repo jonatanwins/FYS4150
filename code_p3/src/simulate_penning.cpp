@@ -34,7 +34,12 @@ void simulate(std::vector<Particle> particles, PenningTrap trap, double dt, int 
             if (time_dependent_E) {
                 trap.update_time_dependent_V0(i*dt);
             }
-        trap.save_to_file(filename, i*dt);
+
+        // Save to file only every 100 steps
+        if (i % 1000 == 0) {
+            trap.save_to_file(filename, i*dt);
+        }
+        
         trap.evolve_RK4(dt);
         }
         trap.save_to_file(filename, timesteps*dt);
@@ -136,9 +141,8 @@ int main() {
     std::vector<Particle> particles;
 
     // choose simulation
-    //simulate_arbitrary_particles(particles, trap, 100, false, 0.1, 0.7, 0.3, 0.2, 2.52, 0.02);
-    simulate_traps_constant_E(particles, trap);
+    simulate_arbitrary_particles(particles, trap, 100, true, 0.4, 0.4, 0.0, 2.20, 2.26, 0.01);
+    //simulate_traps_constant_E(particles, trap);
     
 }
-    
-    
+
