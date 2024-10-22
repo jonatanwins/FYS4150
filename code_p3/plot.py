@@ -76,16 +76,14 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p):
     t_anl, z_anl = single_z_anl(wz, r0, t_max, N_points)
 
     filename = "one_particle_int_RK4.txt"
-    # filename = "one_particle_int_RK4_time_dep.txt"
+    # change to: "one_particle_int_FE.txt" for Forward Euler method
     t, r, v, n = read_file(filename)
 
     # ------------------------------- Plotting motion z -------------------------------
     fig = plt.figure(figsize=(6, 6))
-    fig.suptitle("Single particle motion in time, z-direction in time", fontsize=fsize)
+    fig.suptitle("Single particle, z-direction Motion vs. Time", fontsize=fsize)
     ax = fig.add_subplot(1, 1, 1)
 
-    # plot in micro-seconds/meters
-    # t_anl, z_anl = t_anl*1e6, z_anl*1e6
     ax.plot(t_anl, z_anl, label=r"$z_{analytical}$")
     ax.plot(t, r[0, :, 2], label=r"$z$", linestyle="--")
 
@@ -96,14 +94,15 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p):
     plt.tight_layout()
     plt.legend()
     plt.grid()
-    plt.savefig("plots/one_tz.pdf")
+    plt.savefig("plots/one_tz_RK4.pdf")
 
     # ------------------------------- Plotting Rel. Error -------------------------------
-    # For both FE and RK4
-
-    # solver_list = ["euler", "RK4"]
-    solver_list = ["RK4"]
+    solver_list = ["FE", "RK4"]
+    # if only want RK4 set: solver_list = ["RK4"]
     n_list = [4000, 8000, 16000, 32000]  # timesteps
+
+
+   
 
     # Create lists for calculating error convergence rate
     h_list = np.zeros((len(solver_list), len(n_list)))
@@ -121,25 +120,26 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p):
             t_anl, x_anl, y_anl = single_xy_anl(wz, w0, r0, v0, phi_p, phi_m, t_max, N)
             r_anl = np.array([x_anl, y_anl, z_anl]).T
 
+
             filename = "one_particle_no_int_n=" + str(n_list[j]) + "_" + solver + ".txt"
             t, r, v, n = read_file(filename)
 
             # ----------- Calculate rel. err ----------
-            eps = 1e-15  # buffer - not divide by zero
             r = r[0, :, :]
-            r_err = np.linalg.norm(r - r_anl, axis=1) / (
-                np.linalg.norm(r_anl, axis=1) + eps
-            )
-
+            r_err = np.linalg.norm(r - r_anl, axis=1) / (np.linalg.norm(r_anl, axis=1))
+            
             ax.plot(t_anl, r_err, label=f"Rel. Err, n = {N-1}")
 
             h_list[i, j] = 50 / n_list[j]  # micro-seconds
             delta_list[i, j] = max(np.linalg.norm(r - r_anl, axis=1))
 
+        
+
         ax.set_xlabel(r"t $[\mu s]$", fontsize=fsize2)
         ax.set_ylabel(r"Rel. Error $[]$", fontsize=fsize2)
         ax.legend()
 
+        plt.yscale('log')
         plt.tight_layout()
         plt.legend()
         plt.grid()
@@ -147,37 +147,34 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p):
         plt.show()
 
         # ------------------------------ Error convergence rate ---------------------------
-        # print(h_list)
-        # print(delta_list)
-        for i in range(len(solver_list)):
-            for j in range(1, len(n_list)):
-                r_err_con += (
-                    1
-                    / 3
-                    * np.log10(delta_list[i, j] / delta_list[i, j - 1])
-                    / np.log10(h_list[i, j] / h_list[i, j - 1])
-                )
 
-        for i in range(len(solver_list)):
-            print(
-                "------------------------- Error Convergence Rate, r_err --------------------"
-            )
-            print(f"Solver: {solver_list[i]} \n r_err = {r_err_con[i]:.3e} \n \n \n")
+        for j in range(1, len(n_list)):
+            r_err_con[i] += (1 / 3 * np.log10(delta_list[i, j] / delta_list[i, j - 1]) / np.log10(h_list[i, j] / h_list[i, j - 1]))
+
+        print(
+            "------------------------- Error Convergence Rate, r_err --------------------"
+        )
+        print(f"Solver: {solver_list[i]} \n   r_err = {r_err_con[i]:.3e} \n \n \n")
 
 
 def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
 
+    solver = "RK4"  #change to "FE" for forward Euler, "RK4" for Runge-kutta 4
+
     if double_xy or double_xv or double_zv or double_xyz:
         # ------------------------------- Read file -----------------------------
+        # For RK4 read:  "two_particles_(interaction)_RK4.txt"
+        # For FE  read:  "two_particles_(interaction)_FE.txt"
         if interactions:  # with interactions
-            filename = "two_particles_int_RK4.txt"
+            filename = "two_particles_int_" + solver + ".txt" 
             add = "_int"
         else:  # without interactions
-            filename = "two_particles_no_int_RK4.txt"
+            filename = "two_particles_no_int_" + solver + ".txt" 
             add = "_no_int"
         # add to .pdf-name to separate interactinon with non-interaction
 
         t, r, v, n_particles = read_file(filename)
+
 
     # ------------------------------- Plotting -------------------------------
     if double_xy:
@@ -197,9 +194,8 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         # ax.set_ylim(-d,d)
         ax.legend()
         ax.grid()
-        # ax.axis('equal')
         plt.tight_layout()
-        plt.savefig("plots/two_xy" + add + ".pdf")
+        plt.savefig("plots/two_xy" + add + "_" + solver + ".pdf")
 
     if double_xv:
         fig = plt.figure(figsize=(7, 7))
@@ -213,9 +209,6 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
             )
         ax = fig.add_subplot(1, 1, 1)
 
-        # plot in micro-seconds/meters
-        # t, z, t_anl, z_anl = t*1e6, z*1e6, t_anl*1e6, z_anl*1e6
-
         for n in range(n_particles):
             ax.plot(r[n, :, 0], v[n, :, 0], label=f"P{n+1}")
 
@@ -224,7 +217,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         ax.legend()
         ax.grid()
         plt.tight_layout()
-        plt.savefig("plots/two_xv" + add + ".pdf")
+        plt.savefig("plots/two_xv" + add + "_" + solver + ".pdf")
 
     if double_zv:
         fig = plt.figure(figsize=(7, 7))
@@ -238,9 +231,6 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
             )
         ax = fig.add_subplot(1, 1, 1)
 
-        # plot in micro-seconds/meters
-        # t, z, t_anl, z_anl = t*1e6, z*1e6, t_anl*1e6, z_anl*1e6
-
         for n in range(n_particles):
             ax.plot(r[n, :, 2], v[n, :, 2], label=f"P{n+1}")
 
@@ -249,7 +239,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         ax.legend()
         ax.grid()
         plt.tight_layout()
-        plt.savefig("plots/two_zv" + add + ".pdf")
+        plt.savefig("plots/two_zv" + add + "_" + solver + ".pdf")
 
     if double_xyz:
         fig = plt.figure(figsize=(7, 7))
@@ -264,8 +254,7 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
 
         for n in range(n_particles):
             ax.plot(r[n, :, 0], r[n, :, 1], r[n, :, 2], label=f"P{n+1}")
-            ax.scatter(r[n, 0, 0], r[n, 0, 1], r[n, 0, 2], "r")
-            ax.scatter(r[n, -1, 0], r[n, -1, 1], r[n, -1, 2], "g")
+            ax.scatter(r[n, 0, 0], r[n, 0, 1], r[n, 0, 2], color="red")
 
         ax.set_xlabel(r"x $[\mu m]$")
         ax.set_ylabel(r"y $[\mu m]$")
@@ -277,108 +266,136 @@ def two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz):
         ax.legend()
         ax.grid()
         plt.tight_layout()
-        plt.savefig("plots/two_xyz" + add + ".pdf")
+        plt.savefig("plots/two_xyz" + add + "_" + solver + ".pdf")
 
 
 def loss_particles(interactions, solver):
-    # ------------------------------- Read file -----------------------------
-    f_list = np.linspace(0.1, 0.7, 3)
-    w_list = np.linspace(2.18, 2.30, 7)
-    # print(f_list, w_list)
+    count_particles = False
+    if count_particles:
+        # ------------------------------- Read file -----------------------------
+        f_list = np.linspace(0.1, 0.7, 3)
+        w_list = np.linspace(2.18, 2.30, 7)
+        # print(f_list, w_list)
 
-    #f_list = np.linspace(0.1, 0.7, 3)
-    #w_list = np.linspace(0.2, 2.48, 115)
-    #print(f_list, w_list)
-
-
-    file_list = [i for i in range(len(f_list) * len(w_list))]
-    # file_list = np.zeros(len(f_list) * len(w_list))
-
-    if interactions:  # with interactions
-        add = "int_"
-        for i in range(len(f_list)):
-            for j in range(len(w_list)):
-                file_list[i * len(w_list) + j] = (
-                    add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
-                )
-
-    else:  # without interactions
-        add = "no_int_"
-        for i in range(len(f_list)):
-            for j in range(len(w_list)):
-                file_list[i * len(w_list) + j] = (
-                    add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
-                )
+        #f_list = np.linspace(0.1, 0.7, 3)
+        #w_list = np.linspace(0.2, 2.48, 115)
+        #print(f_list, w_list)
 
 
-    # ----- Sum up trapped particles --------
-    trapped_list = np.zeros(len(file_list))
-    # trapped_list = np.zeros(len(f_list), len(w_list))
-    for i, filename in enumerate(file_list):
-        t, r, v, n_particles = read_file(filename)
+        file_list = [i for i in range(len(f_list) * len(w_list))]
+        # file_list = np.zeros(len(f_list) * len(w_list))
 
-        n_particles = len(r[:, 0, 0])
-        particles = np.zeros(n_particles)  # 0 = outside
+        if interactions:  # with interactions
+            add = "int_"
+            for i in range(len(f_list)):
+                for j in range(len(w_list)):
+                    file_list[i * len(w_list) + j] = (
+                        add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
+                    )
 
-        for n in range(n_particles):
-            # check if |r(t_max)| <= d
-            if np.linalg.norm(r[n, -1, :]) <= d: 
-                particles[n] = 1  # 1 = trapped inside
-
-        trapped_list[i] = sum(particles)
-
-
-
-    # ------ Plot histogram ----------
-    fig = plt.figure(figsize=(7, 7))
-    if interactions:
-        fig.suptitle(
-            f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwith interaction",
-            fontsize=fsize,
-        )
-    else:
-        fig.suptitle(
-            f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwithout interaction",
-            fontsize=fsize,
-        )
-
-    ax = fig.add_subplot(111)
-
-    # Create heatmap
-    yedges = f_list  # [0.1, 0.4,] # modify these
-    xedges = w_list  # [0.2]      # modify these
-    trapped_list = trapped_list.reshape(len(w_list), len(f_list))  # reshape for heatmap
-    # trapped_list = trapped_list.reshape(1,-1)
-
-    print("File list:  ", file_list)
-    print("Trapped list:  ", trapped_list)
-    print("Trapped list shape: ", trapped_list.shape)
-    #sns.heatmap(trapped_list, annot=True, cmap="Blues", xticklabels=xedges, yticklabels=yedges)
-    sns.heatmap(trapped_list.T, annot=False, cmap="Blues", xticklabels=xedges, yticklabels=yedges, linewidths=0)
+        else:  # without interactions
+            add = "no_int_"
+            for i in range(len(f_list)):
+                for j in range(len(w_list)):
+                    file_list[i * len(w_list) + j] = (
+                        add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
+                    )
 
 
-    ax.set_xlabel(r"Frequency $\omega_v$ [MHz]")
-    ax.set_ylabel(r"Amplitude f $[]$")
-    ax.grid(False)
-    plt.tight_layout()
-    plt.savefig("plots/trapped_" + add + solver + ".pdf")
+        # ----- Sum up trapped particles --------
+        trapped_list = np.zeros(len(file_list))
+        # trapped_list = np.zeros(len(f_list), len(w_list))
+        for i, filename in enumerate(file_list):
+            t, r, v, n_particles = read_file(filename)
 
-    
+            n_particles = len(r[:, 0, 0])
+            particles = np.zeros(n_particles)  # 0 = outside
+
+            for n in range(n_particles):
+                # check if |r(t_max)| <= d
+                if np.linalg.norm(r[n, -1, :]) <= d: 
+                    particles[n] = 1  # 1 = trapped inside
+
+            trapped_list[i] = sum(particles)
+
+
+
+        # ------ Plot histogram ----------
+        fig = plt.figure(figsize=(7, 7))
+        if interactions:
+            fig.suptitle(
+                f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwith interaction",
+                fontsize=fsize,
+            )
+        else:
+            fig.suptitle(
+                f"Fraction of {n_particles} particles trapped after {tot_time}µs \nwithout interaction",
+                fontsize=fsize,
+            )
+
+        ax = fig.add_subplot(111)
+
+        # Create heatmap
+        yedges = f_list  # [0.1, 0.4,] # modify these
+        xedges = w_list  # [0.2]      # modify these
+        trapped_list = trapped_list.reshape(len(w_list), len(f_list))  # reshape for heatmap
+        # trapped_list = trapped_list.reshape(1,-1)
+
+        print("File list:  ", file_list)
+        print("Trapped list:  ", trapped_list)
+        print("Trapped list shape: ", trapped_list.shape)
+        #sns.heatmap(trapped_list, annot=True, cmap="Blues", xticklabels=xedges, yticklabels=yedges)
+        sns.heatmap(trapped_list.T, annot=False, cmap="Blues", xticklabels=xedges, yticklabels=yedges, linewidths=0)
+
+
+        ax.set_xlabel(r"Frequency $\omega_v$ [MHz]")
+        ax.set_ylabel(r"Amplitude f $[]$")
+        ax.grid(False)
+        plt.tight_layout()
+        plt.savefig("plots/trapped_" + add + solver + ".pdf")
+
+        
+
+
+
+
+
+
+
     # ----------------- Plot time evolution -------------------
-    n_particles = 10 # is defined above and WILL DELITE WHEN FINISHED
+    n_particles = 100 # is defined above and WILL DELITE WHEN FINISHED
 
     fig = plt.figure(figsize=(6, 6))
-    fig.suptitle(f"Time evolution of {n_particles} trapped particles", fontsize=fsize)
+    if interactions:  # with interactions
+        add = "int_"
+        fig.suptitle(f"Time evolution of {n_particles} trapped particles \nwith interaction", fontsize=fsize)
+    else:  # without interactions
+        add = "no_int_"
+        fig.suptitle(f"Time evolution of {n_particles} trapped particles \nwithout interaction", fontsize=fsize)
     ax = fig.add_subplot(1, 1, 1)
 
 
     # ---- Selecting chousen values for time evolution ---
     # [[i1,j1] , [i2,j2]]
     #ij_list = [[1,0],[1,1],[1,2]]
-    ij_list = [[1,2]]
+    #ij_list = [[1,2]]
+
+
+    # --------------- DO IT MANUALLY TO CHECK GIVEN FILES -------------------
+    f_list = [0.39, 0.4]
+    w_list = [2.239, 2.24]
+
+    ij_list = [[0,0], [1,1]]
+
+    if interactions:  # with interactions
+        add = "int_"
+    else:  # without interactions
+        add = "no_int_"
+    # -----------------------------------------------------------------------
+
 
     for i, j in ij_list:
-        filename = add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"
+        filename = add + "f_" + str(f_list[i]) + "_w_v_" + str(w_list[j]) + "_.txt"  
         t, r, v, n_particles = read_file(filename)
 
         trapped = np.zeros(len(t))
@@ -495,7 +512,7 @@ if __name__ == "__main__":
     d = 500.0  # μm
     e = 1  # electron charge = 1.6e-19 C
     m_p = 40.078  # Proton mass = 1.6726219e-27 kg
-    tot_time = 500
+    tot_time = 50 
 
     B0 = 1.00  # Tesla
     V0 = 25.0e-3  # Volt
@@ -529,16 +546,29 @@ if __name__ == "__main__":
     phi_m = 0  # Phase phi-
 
     # --------------------------------------- PLOTS BOOL -----------------------------------
-    want_single = False
+    want_single = True
 
-    double_xy = False
-    double_xv = False
-    double_zv = False
-    double_xyz = False
+    double_xy = True
+    double_xv = True
+    double_zv = True
+    double_xyz = True
 
     interactions = False  # With interaction = True,   Without interactions = False
 
-    want_loss_particles = True
+    want_loss_particles = False
+
+    # ------------------------------------   Cyclotron freq -----------------------------
+    cy_freq = q/m * B0 #* 1/(2*np.pi) 
+
+    omega_plus = (w0 + np.sqrt(w0**2 - 2 * wz**2)) / 2
+    omega_minus = (w0 - np.sqrt(w0**2 - 2 * wz**2)) / 2
+
+    print(f'Cyclotron Frequency Ca+: freq = ', cy_freq)
+    print(f'w_0 = ', w0, 'base units')
+    print(f'w_z = ', wz, 'base units')
+    print(f'w_minus = ', omega_minus, ' base units')
+    print(f'w_plus = ', omega_plus, ' base units')
+    print()
 
     # -------------------------------------   1 Particle --------------------------------
     if want_single:
@@ -549,8 +579,8 @@ if __name__ == "__main__":
     two_particles(interactions, d, double_xy, double_xv, double_zv, double_xyz)
 
     # -------------------------------- Loss of trapped particles ---------------------------
-    solver = "RK4"  # chose '_RK4' or '_FE'
+    solver = "RK4"  #only for pdf-name
     if want_loss_particles:
         loss_particles(interactions, solver)
 
-    # Version 18.10-2024
+    # Version 22.10-2024
