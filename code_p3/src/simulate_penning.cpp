@@ -97,7 +97,7 @@ void simulate_traps_constant_E(std::vector<Particle> particles, PenningTrap trap
     }
 }
 
-void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTrap trap, bool interactions) {
+void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTrap trap, bool interactions, int sample_rate) {
 
     double time = 500;
     double dt = 0.01;
@@ -114,13 +114,13 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
     }
     
 
-    simulate(particles, trap, dt, timesteps, filename.str(), interactions, "RK4", true);
+    simulate(particles, trap, dt, timesteps, filename.str(), interactions, "RK4", true, sample_rate);
     std::cout << "Completed simulation " << filename.str() << std::endl;
 }
 
-void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles, bool interactions = false,
+void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap trap, int number_of_particles, int sample_rate, bool interactions = false,
                                     double f_start = 0.1, double f_stop = 0.7, double f_step = 0.3, 
-                                    double w_v_start = 2.18, double w_v_stop = 2.32, double w_v_step = 0.2
+                                    double w_v_start = 2.18, double w_v_stop = 2.32, double w_v_step = 0.02
                                     ) {
     arma::arma_rng::set_seed(4150); // set seed for reproducability, FYS4150
     
@@ -128,27 +128,64 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
         particles.push_back(Particle(40.078, 1.0, arma::vec(3).randn() * 0.1 * d_const, arma::vec(3).randn()*0.1*d_const)); // adding more protons
     }
 
+
+    if (f_step != 0.0 && w_v_step != 0.0) {
+        
     for (double f = f_start; f <= f_stop; f += f_step) {
         for (double w_v = w_v_start; w_v <= w_v_stop; w_v += w_v_step) { 
             std::cout << "f: " << f << " w_v: " << w_v << std::endl;
             trap.set_time_dependent_params(f, w_v);
-            simulate_traps_time_dependent_E(particles, trap, interactions);
+            simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
             }
+        }
     }
-   
+
+    else if (f_step == 0.0 && w_v_step != 0.0) {
+        for (double w_v = w_v_start; w_v <= w_v_stop; w_v += w_v_step) { 
+            std::cout << "w_v: " << w_v << std::endl;
+            trap.set_time_dependent_params(0.0, w_v);
+            simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
+        }
+    }
+
+    else if (f_step != 0.0 && w_v_step == 0.0) {
+        for (double f = f_start; f <= f_stop; f += f_step) {
+            std::cout << "f: " << f << std::endl;
+            trap.set_time_dependent_params(f, 0.0);
+            simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
+        }
+    }
+
+    else {
+        trap.set_time_dependent_params(f_start, w_v_start);
+        simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
+        }
 }
                                     
 
 
 int main() {
-    // intialization
+
+    // initialization 
     create_directories();
     PenningTrap trap(B0_converted, V0_converted, d_const);
     std::vector<Particle> particles;
 
-    // choose simulation
-    //simulate_arbitrary_particles(particles, trap, 100, true, 0.4, 0.4, 0.0, 1.33, 1.42, 0.01);
     simulate_traps_constant_E(particles, trap);
+
+    // for the grid search (no interactions)
+    //simulate_arbitrary_particles(particles, trap, 100, false, 0.1, 0.7, 0.3, 0.2, 2.52, 0.02);
+
+    // for the exploration of w_v found from the grid search (with interactions)
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 0.67, 0.71, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 1.36, 1.4, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 2.2, 2.24, 0.01);
+
+    // smaller sample rate for the best w_v (with interactions)
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 0.68, 0.68, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 1.38, 1.38, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 2.21, 2.21, 0.01);
+
     
 }
 
