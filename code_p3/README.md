@@ -30,7 +30,8 @@ All plots are generated in the plotting.ipynb file, including animations of the 
 
 ### Animations
 Animations are available in the animations folder.
-![Example](animations/animationgif.gif)
+
+<img src="animations/animationgif.gif" alt="Example" width="200"/>
 
 ### Information about data structure
 
