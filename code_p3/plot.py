@@ -306,7 +306,7 @@ def grid_search_loss():
 
     plt.figure(figsize=(10, 7))
     ax = sns.heatmap(df_pivot, annot=False, cmap="crest")
-    plt.title("Heatmap of number of trapped particles after 500 $\mu$s", fontsize=fsize)
+    plt.title("Number of trapped particles after 500 $\mu$s without interactions", fontsize=fsize)
     plt.xlabel(r"$\omega_V$", fontsize=fsize2)
     plt.ylabel("f", fontsize=fsize2)
 
@@ -320,7 +320,7 @@ def grid_search_loss():
     cbar = ax.collections[0].colorbar
     cbar.ax.tick_params(labelsize=fsize)
 
-    plt.savefig("plots/heatmap_trapped_particles.png")
+    plt.savefig("plots/heatmap_trapped_particles.pdf")
 
 
 def time_evolution(w_v_middle):
@@ -353,4 +353,4 @@ def time_evolution(w_v_middle):
     plt.ylabel("Trapped particles", fontsize=fsize2)
     plt.title("Time evolution of the number of trapped particles, with interactions", fontsize=fsize)
     plt.legend()
-    plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.png")
+    plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.pdf")

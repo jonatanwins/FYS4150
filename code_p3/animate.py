@@ -29,6 +29,7 @@ def parse_file(filename):
 def animate_particles(
     filename, start_time, end_time, fps=30, frame_skip=1, zoom=500
 ):
+    w_v = filename.split("_")[-2]
     timesteps, positions, num_particles = parse_file(filename)
     first_timestep = int(start_time*10) # data is sampled every 10-th timestep
     last_timestep = int(end_time*10) # data is sampled every 10-th timestep
@@ -68,7 +69,8 @@ def animate_particles(
         if timestep_value.is_integer():
             timestep_value = int(timestep_value)
 
-        ax.set_title(f"Time: {timestep_value}")
+        ax.set_title(fr"$\omega_V$ = {w_v}, time: {timestep_value}")
+
         return (scat,)
 
     num_frames = len(selected_positions) // frame_skip
@@ -77,3 +79,4 @@ def animate_particles(
 
     plt.close(fig)
     display(HTML(ani.to_jshtml()))
+
