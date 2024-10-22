@@ -50,7 +50,9 @@ We simulate the Penning trap.
 ## Installation
 Compiled with `c++17`.
 
-Command for running is saved to the file run.sh.
+Changes in the simulation are done in src/simulate_penning.cpp exclusively. 
+There are comments to illustrate how to do this in the file.
+Command for running src/simulate_penning.cpp is saved to the file run.sh.
 On Unix, you can therefore compile with `clang` or `g++` by using the following command:
 
 ```bash
