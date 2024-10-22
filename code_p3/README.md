@@ -5,6 +5,7 @@
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Plots](#plots)
+- [Animations](#animations)
 - [Information about data structure](#information-about-data-structure)
 
 ## Introduction
@@ -26,6 +27,10 @@ On Unix, you can therefore compile with `clang` or `g++` by using the following 
 
 ### Plots
 All plots are generated in the plotting.ipynb file, including animations of the Penning trap. 
+
+### Animations
+Animations are available in the animations folder.
+![Example](animationgif.gif)
 
 ### Information about data structure
 
