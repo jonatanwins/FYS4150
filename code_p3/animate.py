@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from matplotlib import cm
+from matplotlib import cm, rcParams
+from IPython.display import HTML, display
+
+# allowing for larger animations
+rcParams['animation.embed_limit'] = 50
 
 
 def parse_file(filename):
@@ -23,9 +27,11 @@ def parse_file(filename):
 
 
 def animate_particles(
-    filename, first_timestep, last_timestep, fps=30, frame_skip=1, zoom=500
+    filename, start_time, end_time, fps=30, frame_skip=1, zoom=500
 ):
     timesteps, positions, num_particles = parse_file(filename)
+    first_timestep = int(start_time*10) # data is sampled every 10-th timestep
+    last_timestep = int(end_time*10) # data is sampled every 10-th timestep
     selected_positions = positions[first_timestep:last_timestep]
     selected_timesteps = timesteps[first_timestep:last_timestep]
 
@@ -62,25 +68,12 @@ def animate_particles(
         if timestep_value.is_integer():
             timestep_value = int(timestep_value)
 
-        ax.set_title(f"Timestep: {timestep_value}")
+        ax.set_title(f"Time: {timestep_value}")
         return (scat,)
 
     num_frames = len(selected_positions) // frame_skip
 
     ani = FuncAnimation(fig, update, frames=num_frames, interval=interval)
 
-    # Show the animation
-    plt.show()
-
-
-# Example usage:
-filename = "code_p3/animation_0.7/int_f_0.7_w_v_0.7_.txt"
-first_timestep = 18000
-last_timestep = 25000
-fps = 30
-frame_skip = 10
-zoom = 500
-
-animate_particles(
-    filename, first_timestep, last_timestep, fps=fps, frame_skip=frame_skip, zoom=zoom
-)
+    plt.close(fig)
+    display(HTML(ani.to_jshtml()))
