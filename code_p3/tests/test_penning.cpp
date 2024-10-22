@@ -3,13 +3,6 @@
 #include "Particle.hpp"
 #include "constants.hpp"
 
-void check_outside_region() {
-    // task 9
-    // Implement a check that sets the external E- and B-fields to zero in the region outside the trap. 
-    // We’ll use the characteristic distance as a simple measure for the trap size, 
-    // so what we need is a check that sets the external fields E and B to zero when |r| > d.
-}
-
 
 int main(){
     double B0 = B0_converted;
@@ -39,10 +32,6 @@ int main(){
     trap.add_particle(electron1);
     //trap.add_particle(electron2);
 
-    std::cout << "Bigger: " << B0*B0*1/40 << std::endl;
-    std::cout << "Smaller: " << 4*V0/(d*d) << std::endl;
-
-
     //std::string filename = "data/testing_for_benjamin_one_particle.txt";
     //std::ofstream ofile(filename, std::ios::trunc);
     //ofile.close(); 
@@ -58,5 +47,5 @@ int main(){
 }
 
 
-//  g++ code_p3/src/simulate_penning.cpp code_p3/src/utils.cpp code_p3/src/Particle.cpp  code_p3/src/PenningTrap.cpp -I code_p3/include -o out -std=c++14 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
+//  g++ src/simulate_penning.cpp src/utils.cpp src/Particle.cpp  src/PenningTrap.cpp -I include -o out -std=c++17 -I/opt/homebrew/Cellar/armadillo/14.0.2_1/include -L/opt/homebrew/Cellar/armadillo/14.0.2_1/lib -larmadillo && ./out
 

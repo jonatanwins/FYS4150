@@ -351,6 +351,6 @@ def time_evolution(w_v_middle):
 
     plt.xlabel(r"$Time [\mu s]$", fontsize=fsize2)
     plt.ylabel("Trapped particles", fontsize=fsize2)
-    plt.title("Time evolution of # trapped particles, with interactions", fontsize=fsize)
+    plt.title("Time evolution of the number of trapped particles, with interactions", fontsize=fsize)
     plt.legend()
     plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.png")
