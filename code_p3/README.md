@@ -35,3 +35,27 @@ e.g.
 1.1 2.0 3.0 0.4 0.5 0.6
 0.7 0.8 0.9 1.0 1.1 1.2
 0.0 0.0 0.0 0.0 0.0 0.0
+
+# Project 3 - FYS4150 <!-- omit in toc -->
+
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Plots](#plots)
+
+## Introduction
+This is project 3 for FYS4150 at the university of Oslo for the fall of 2024. 
+We simulate the Penning trap. 
+
+
+## Installation
+Compiled with `c++17`.
+
+Command for running is saved to the file run.sh.
+On Unix, you can therefore compile with `clang` or `g++` by using the following command:
+
+```bash
+./run.sh
+```
+
+### Plots
+All plots are generated in the plotting.ipynb file, including animations of the Penning trap. 
