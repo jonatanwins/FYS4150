@@ -353,6 +353,6 @@ def time_evolution(w_v_middle, interactions = True):
     plt.ylabel("Trapped particles", fontsize=fsize2)
     title_info = "with" if interactions else "without"
     plt.title(f"Time evolution of the number of trapped \n particles, {title_info} interactions", fontsize=fsize)
-    plt.legend()
+    plt.legend(fontsize=fsize2)
     plt.grid()
     plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.pdf")
