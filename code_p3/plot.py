@@ -90,8 +90,8 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p, tot_time):
     fig.suptitle("One particle, z-position over time, RK4", fontsize=fsize)
     ax = fig.add_subplot(1, 1, 1)
 
-    ax.plot(t_anl, z_anl, label=r"$z_{analytical}$")
-    ax.plot(t, r[0, :, 2], label=r"$z$", linestyle="--")
+    ax.plot(t_anl, z_anl, label=r"$Analytical solution$")
+    ax.plot(t, r[0, :, 2], label=r"$Numerical solution$", linestyle="--")
 
     ax.set_xlabel(r"t $[\mu s]$", fontsize=fsize2)
     ax.set_ylabel(r"z $[\mu m]$", fontsize=fsize2)
@@ -299,7 +299,6 @@ def grid_search_loss():
         data["w_v"].append(entry["w_v"])
         data["trapped"].append(entry["trapped"])
 
-    # Create a DataFrame from the dictionary
     df = pd.DataFrame(data)
 
     df_pivot = df.pivot("f", "w_v", "trapped")
@@ -307,13 +306,12 @@ def grid_search_loss():
     plt.figure(figsize=(6,7))
     ax = sns.heatmap(df_pivot, annot=False, cmap="crest")
     plt.title(f"Number of trapped particles after \n 500 μs  without interactions", fontsize=fsize)
-    plt.xlabel(r"$\omega_V$", fontsize=fsize2)
-    plt.ylabel("f", fontsize=fsize2)
+    plt.xlabel(r"$\omega_V [\text{MHz}]$", fontsize=fsize2)
+    plt.ylabel(r"f [$\frac{\mu\text{m}^2}{\mu\text{s}^2 \cdot e}$]", fontsize=fsize2)
 
     plt.xticks(fontsize=fsize)
     plt.yticks(fontsize=fsize)
 
-    # Adjust number of ticks on x and y axes
     plt.locator_params(axis='x', nbins=15)
     plt.locator_params(axis='y', nbins=10)
 
@@ -347,7 +345,7 @@ def time_evolution(w_v_middle, interactions = True):
     plt.figure(figsize=(7, 7))
 
     for i, w in enumerate(w_file):
-        plt.plot(t, all_particles[i], label=fr"$\omega_v = {w}$")
+        plt.plot(t, all_particles[i], label=fr"$\omega_v = {w} \ MHz$")
 
     plt.xlabel(r"$Time [\mu s]$", fontsize=fsize2)
     plt.ylabel("Trapped particles", fontsize=fsize2)
