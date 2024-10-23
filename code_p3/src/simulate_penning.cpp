@@ -196,9 +196,9 @@ int main() {
     //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 2.2, 2.25, 0.01);
 
     // --- smaller sample rate for the best w_v (with interactions) ---> expected file size = 52.9 MB
-    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 0.68, 0.68, 0.01);
-    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 1.38, 1.38, 0.01);
-    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 2.21, 2.21, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 0.69, 0.69, 0.00);
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 1.38, 1.38, 0.00);
+    //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 2.21, 2.21, 0.00);
 
     
 }

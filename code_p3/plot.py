@@ -303,7 +303,7 @@ def grid_search_loss():
 
     df_pivot = df.pivot("f", "w_v", "trapped")
 
-    plt.figure(figsize=(6,7))
+    plt.figure(figsize=(7,7))
     ax = sns.heatmap(df_pivot, annot=False, cmap="crest")
     plt.title(f"Number of trapped particles after \n 500 μs  without interactions", fontsize=fsize)
     plt.xlabel(r"$\omega_V [\text{MHz}]$", fontsize=fsize2)
@@ -353,4 +353,4 @@ def time_evolution(w_v_middle, interactions = True):
     plt.title(f"Time evolution of the number of trapped \n particles, {title_info} interactions", fontsize=fsize)
     plt.legend(fontsize=fsize2)
     plt.grid()
-    plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.pdf")
+    plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}_{title_info}_interactions.pdf")
