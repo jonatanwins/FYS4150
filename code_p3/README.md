@@ -10,7 +10,7 @@
 
 ## Introduction
 This is project 3 for FYS4150 at the university of Oslo for the fall of 2024. 
-We simulate the Penning trap. 
+We simulate the Penning trap with 100 Ca+ particles and animate their orbits under resonance frequencies. 
 
 
 ## Installation
@@ -48,6 +48,7 @@ Charge: the elementary charge (e)
 
 File structure for simulations in txt:
 
+```
 #particles #timesteps
 t0
 P1x P1y P1z P1Vx P1Vy P1Vz
@@ -74,3 +75,4 @@ e.g.
 1.1 2.0 3.0 0.4 0.5 0.6
 0.7 0.8 0.9 1.0 1.1 1.2
 0.0 0.0 0.0 0.0 0.0 0.0
+```
