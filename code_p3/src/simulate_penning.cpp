@@ -114,6 +114,9 @@ void simulate_traps_time_dependent_E(std::vector<Particle> particles, PenningTra
     else if (interactions && sample_rate == 10) {
         filename << "data/int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_full.txt";
     }
+    else if (!interactions && sample_rate == 1000) {
+        filename << "data/no_int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_fine.txt";
+    }
     else {
         filename << "data/no_int_" << "f_" << trap.f << "_w_v_" << trap.w_v << "_.txt";
     }
@@ -148,7 +151,7 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
     else if (f_step == 0.0 && w_v_step != 0.0) {
         for (double w_v = w_v_start; w_v <= w_v_stop; w_v += w_v_step) { 
             std::cout << "w_v: " << w_v << std::endl;
-            trap.set_time_dependent_params(0.0, w_v);
+            trap.set_time_dependent_params(f_start, w_v);
             simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
         }
     }
@@ -156,7 +159,7 @@ void simulate_arbitrary_particles(std::vector<Particle> particles, PenningTrap t
     else if (f_step != 0.0 && w_v_step == 0.0) {
         for (double f = f_start; f <= f_stop; f += f_step) {
             std::cout << "f: " << f << std::endl;
-            trap.set_time_dependent_params(f, 0.0);
+            trap.set_time_dependent_params(f, w_v_start);
             simulate_traps_time_dependent_E(particles, trap, interactions, sample_rate);
         }
     }
@@ -182,10 +185,15 @@ int main() {
     // --- for the grid search (no interactions) ---> expected file size = 11 kB 
     //simulate_arbitrary_particles(particles, trap, 100, 50001, false, 0.1, 0.7, 0.3, 0.2, 2.52, 0.02);
 
+    // --- for the exploration of w_v found from the grid search (without interactions) ---> expected file size = 541 kB 
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, false, 0.4, 0.4, 0.0, 0.67, 0.72, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, false, 0.4, 0.4, 0.0, 1.36, 1.41, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, false, 0.4, 0.4, 0.0, 2.2, 2.25, 0.01);
+
     // --- for the exploration of w_v found from the grid search (with interactions) ---> expected file size = 541 kB 
-    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 0.67, 0.67, 0.00);
-    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 1.36, 1.4, 0.01);
-    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 2.2, 2.24, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 0.67, 0.72, 0.01);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 1.36, 1.41, 0.00);
+    //simulate_arbitrary_particles(particles, trap, 100, 1000, true, 0.4, 0.4, 0.0, 2.2, 2.25, 0.01);
 
     // --- smaller sample rate for the best w_v (with interactions) ---> expected file size = 52.9 MB
     //simulate_arbitrary_particles(particles, trap, 100, 10, true, 0.4, 0.4, 0.0, 0.68, 0.68, 0.01);

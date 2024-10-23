@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import pandas as pd
 
-fsize = 18 # Fontsize for title
+fsize = 20 # Fontsize for title
 fsize2 = 15 # Fontsize for labels
 
 
@@ -86,7 +86,7 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p, tot_time):
     t, r, v, n = read_file(filename)
 
     # ------------------------------- Plotting motion z -------------------------------
-    fig = plt.figure(figsize=(6, 6))
+    fig = plt.figure(figsize=(7,7))
     fig.suptitle("One particle, z-position over time, RK4", fontsize=fsize)
     ax = fig.add_subplot(1, 1, 1)
 
@@ -113,7 +113,7 @@ def single_particle(r0, v0, w0, wz, phi_m, phi_p, tot_time):
     r_err_con = np.zeros(len(solver_list))
 
     for i, solver in enumerate(solver_list):
-        fig = plt.figure(figsize=(6, 6))
+        fig = plt.figure(figsize=(7,7))
         fig.suptitle(f"Relative Error, Single particle, {solver}", fontsize=fsize)
         ax = fig.add_subplot(1, 1, 1)
 
@@ -304,9 +304,9 @@ def grid_search_loss():
 
     df_pivot = df.pivot("f", "w_v", "trapped")
 
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(6,7))
     ax = sns.heatmap(df_pivot, annot=False, cmap="crest")
-    plt.title(fr"Number of trapped particles after 500 $\mu$s without interactions", fontsize=fsize)
+    plt.title(f"Number of trapped particles after \n 500 μs  without interactions", fontsize=fsize)
     plt.xlabel(r"$\omega_V$", fontsize=fsize2)
     plt.ylabel("f", fontsize=fsize2)
 
@@ -317,13 +317,10 @@ def grid_search_loss():
     plt.locator_params(axis='x', nbins=15)
     plt.locator_params(axis='y', nbins=10)
 
-    cbar = ax.collections[0].colorbar
-    cbar.ax.tick_params(labelsize=fsize)
-
     plt.savefig("plots/heatmap_trapped_particles.pdf")
 
 
-def time_evolution(w_v_middle):
+def time_evolution(w_v_middle, interactions = True):
 
     w_file = np.array([w_v_middle-0.02, w_v_middle-0.01, w_v_middle, w_v_middle+0.01, w_v_middle+0.02])
     w_file = np.round(w_file, 2)  # Round to 2 decimal places
@@ -332,7 +329,10 @@ def time_evolution(w_v_middle):
     all_particles = []
         
     for w in w_file:
-        t, r, v, n_particles = read_file(f"int_f_0.4_w_v_{w}_.txt")
+        if interactions:
+            t, r, v, n_particles = read_file(f"int_f_0.4_w_v_{w}_.txt")
+        else:
+            t, r, v, n_particles = read_file(f"no_int_f_0.4_w_v_{w}_fine.txt")
         t = t[0:51]
         trapped = np.zeros(len(t))
         for i_t in range(len(t)):
@@ -344,13 +344,15 @@ def time_evolution(w_v_middle):
             trapped[i_t] = sum(particles)
         all_particles.append(trapped)
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(7, 7))
 
     for i, w in enumerate(w_file):
         plt.plot(t, all_particles[i], label=fr"$\omega_v = {w}$")
 
     plt.xlabel(r"$Time [\mu s]$", fontsize=fsize2)
     plt.ylabel("Trapped particles", fontsize=fsize2)
-    plt.title("Time evolution of the number of trapped particles, with interactions", fontsize=fsize)
+    title_info = "with" if interactions else "without"
+    plt.title(f"Time evolution of the number of trapped \n particles, {title_info} interactions", fontsize=fsize)
     plt.legend()
+    plt.grid()
     plt.savefig(f"plots/time_evolution_trapped_around_{w_v_middle}.pdf")

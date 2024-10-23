@@ -80,3 +80,6 @@ def animate_particles(
     plt.close(fig)
     display(HTML(ani.to_jshtml()))
 
+    # save to file
+    #ani.save("animation.html", writer="html")
+
