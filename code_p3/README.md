@@ -18,6 +18,8 @@ Compiled with `c++17`.
 
 Changes in the simulation are done in src/simulate_penning.cpp exclusively. 
 There are comments to illustrate how to do this in the file.
+We would recomend not to try and run all simulations as it takes a lot of time and requires a lot of storage for the txt files. 
+The simulation that is not commented out in the file is the easiest one to run.
 Command for running src/simulate_penning.cpp is saved to the file run.sh.
 On Unix, you can therefore compile with `clang` or `g++` by using the following command while located in the code_p3 directory:
 
@@ -26,10 +28,11 @@ On Unix, you can therefore compile with `clang` or `g++` by using the following 
 ```
 
 ### Plots
-All plots are generated in the plotting.ipynb file, including animations of the Penning trap. 
+All plots are generated in the plotting.ipynb file. 
 
 ### Animations
-Animations are available in the animations folder.
+Animations are available in the animations folder. 
+Each notebook can be downloaded and if opened in VSCode they can be seen without running the code.
 
 <img src="animations/animationgif.gif" alt="Example" width="400"/>
 
